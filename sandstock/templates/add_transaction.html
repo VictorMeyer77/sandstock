@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Add Transaction{% endblock %}
+{% block content %}
+<body>
+    <div class="container mt-4">
+        <h1>Add New Transaction</h1>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+                {{ form.product_id.label(class="form-label") }}
+                {{ form.product_id(class="form-select") }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.transaction_type.label(class="form-label") }}
+                {{ form.transaction_type(class="form-select") }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.quantity.label(class="form-label") }}
+                {{ form.quantity(class="form-control") }}
+            </div>
+
+            <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+        </form>
+
+        <hr>
+        <a href="{{ url_for('add_product') }}" class="btn btn-secondary">Add New Product</a>
+    </div>
+</body>
+</html>
+{% endblock %}

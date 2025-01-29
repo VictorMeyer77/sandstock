@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Recent Transactions</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>Transaction Type</th>
+                    <th>Quantity</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.id }}</td>
+                        <td>{{ transaction.product.name }}</td>
+                        <td>
+                            {% if transaction.transaction_type == 'IN' %}
+                                <span class="badge bg-success">IN</span>
+                            {% else %}
+                                <span class="badge bg-danger">OUT</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ transaction.quantity }}</td>
+                        <td>{{ transaction.transaction_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">No transactions found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+{% endblock %}
