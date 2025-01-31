@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, flash
-from flask_login import login_user, logout_user, login_required, current_user
-from sandstock.models import db, User, Transaction, Product, Category, Supplier
-from sandstock.forms import RegisterForm, LoginForm, TransactionForm, ProductForm
+from flask_login import login_user, logout_user, login_required
+from sandstock.models import db, User, Order, Contact, Address, Partner
+from sandstock.forms import RegisterForm, LoginForm, PartnerForm
 
 
 def register_routes(app: Flask):
@@ -54,72 +54,39 @@ def register_routes(app: Flask):
     @app.route("/")
     @login_required
     def home():
-        transactions = Transaction.query.order_by(Transaction.transaction_date.desc()).limit(20).all()
+        transactions = Order.query.order_by(Order.created_at.desc()).limit(20).all()
         return render_template("home.html", transactions=transactions)
 
-    @app.route("/add-product", methods=["GET", "POST"])
+
+    @app.route("/add_partner", methods=["GET", "POST"])
     @login_required
-    def add_product():
-        form = ProductForm()
-
+    def add_partner():
+        form = PartnerForm()
         if form.validate_on_submit():
-            category = None
-            supplier = None
-
-            if form.new_category.data:
-                category = Category(name=form.new_category.data)
-                db.session.add(category)
-                db.session.commit()
-                flash(f"Category '{category.name}' added!", "success")
-
-            if form.new_supplier.data:
-                supplier = Supplier(name=form.new_supplier.data, contact_info=form.supplier_contact.data)
-                db.session.add(supplier)
-                db.session.commit()
-                flash(f"Supplier '{supplier.name}' added!", "success")
-
-            product = Product(
-                name=form.new_product.data,
-                price=form.product_price.data,
-                category_id=category.id if category else None,
-                supplier_id=supplier.id if supplier else None,
-                stock_quantity=0
-            )
-
-            db.session.add(product)
+            contact = Contact(email=form.email.data, phone_number=form.phone_number.data)
+            db.session.add(contact)
             db.session.commit()
-            flash(f"Product '{product.name}' added!", "success")
-            return redirect(url_for("home"))
 
-        return render_template("add_product.html", form=form)
-
-    @app.route("/add-transaction", methods=["GET", "POST"])
-    @login_required
-    def add_transaction():
-        form = TransactionForm()
-        form.product_id.choices = [(p.id, p.name) for p in Product.query.all()]
-
-        if form.validate_on_submit():
-            product = Product.query.get(form.product_id.data)
-            if form.transaction_type.data == "IN":
-                product.stock_quantity += form.quantity.data
-            elif form.transaction_type.data == "OUT":
-                if product.stock_quantity < form.quantity.data:
-                    flash(f"Not enough stock for '{product.name}'!", "danger")
-                    return redirect(url_for("add_transaction"))
-                product.stock_quantity -= form.quantity.data
-
-            transaction = Transaction(
-                product_id=form.product_id.data,
-                transaction_type=form.transaction_type.data,
-                quantity=form.quantity.data,
+            address = Address(
+                street_address=form.street_address.data,
+                city=form.city.data,
+                state=form.state.data,
+                postal_code=form.postal_code.data,
+                country=form.country.data
             )
-
-            db.session.add(transaction)
+            db.session.add(address)
             db.session.commit()
-            flash("Transaction added successfully!", "success")
-            return redirect(url_for("home"))
 
-        return render_template("add_transaction.html", form=form)
+            partner = Partner(
+                name=form.name.data,
+                contact_person=form.contact_person.data,
+                address_id=address.id,
+                contact_id=contact.id
+            )
+            db.session.add(partner)
+            db.session.commit()
 
+            flash("Partner added successfully!", "success")
+            return redirect(url_for("add_partner"))
 
+        return render_template("add_partner.html", form=form)

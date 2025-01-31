@@ -4,9 +4,6 @@ from wtforms.fields.choices import SelectField
 from wtforms.fields.numeric import IntegerField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
-
-# Login
-
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired()])
@@ -21,7 +18,18 @@ class RegisterForm(FlaskForm):
     ])
     submit = SubmitField("Register")
 
-# Business
+
+class PartnerForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    contact_person = StringField("Contact Person")
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    phone_number = StringField("Phone Number")
+    street_address = StringField("Street Address", validators=[DataRequired()])
+    city = StringField("City", validators=[DataRequired()])
+    state = StringField("State", validators=[DataRequired()])
+    postal_code = StringField("Postal Code", validators=[DataRequired()])
+    country = StringField("Country", validators=[DataRequired()])
+    submit = SubmitField("Add Partner")
 
 class ProductForm(FlaskForm):
     new_category = StringField("New Category")

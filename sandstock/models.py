@@ -1,5 +1,3 @@
-from email.policy import default
-
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_login import UserMixin
@@ -7,18 +5,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
-# Metadata
-
 class User(db.Model, UserMixin):
-    __tablename__ = "users"
+    __tablename__ = "dim_user"
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), nullable=False, unique=True)
+    username = db.Column(db.String(150), nullable=False, unique=False)
     email = db.Column(db.String(150), nullable=False, unique=True)
     password_hash = db.Column(db.String(200), nullable=False)
-    #deleted = db.Column(db.Boolean, nullable=False, default=False)
-    #created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    #updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    deleted = db.Column(db.Boolean, default=False, nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -26,53 +22,77 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-# Business
-
-class Category(db.Model):
-    __tablename__ = "dim_category"
+class Contact(db.Model):
+    __tablename__ = "dim_contact"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False, unique=True)
+    email = db.Column(db.String(150), nullable=True)
+    phone_number = db.Column(db.String(30), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
-class Supplier(db.Model):
-    __tablename__ = "dim_supplier"
+class Address(db.Model):
+    __tablename__ = "dim_address"
+
+    id = db.Column(db.Integer, primary_key=True)
+    street_address = db.Column(db.String(1000), nullable=False)
+    city = db.Column(db.String(500), nullable=False)
+    state = db.Column(db.String(500), nullable=False)
+    postal_code = db.Column(db.String(20), nullable=False)
+    country = db.Column(db.String(200), nullable=False)
+    created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    deleted = db.Column(db.Boolean, default=False, nullable=False)
+
+
+class Partner(db.Model):
+    __tablename__ = "dim_partner"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text, nullable=False)
+    contact_person = db.Column(db.String(200), nullable=True)
+    address_id = db.Column(db.Integer, db.ForeignKey("dim_address.id"), nullable=False)
+    contact_id = db.Column(db.Integer, db.ForeignKey("dim_contact.id"), nullable=False)
+    created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    deleted = db.Column(db.Boolean, default=False, nullable=False)
+
+
+class Warehouse(db.Model):
+    __tablename__ = "dim_warehouse"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
-    address = db.Column(db.String(500), nullable=False)
-    # todo full address
-    #contact_person = db.Column(db.String(200), nullable=True)
-    #email = db.Column(db.String(200), nullable=False)
-    phone = db.Column(db.String(20), nullable=False)
-    #deleted = db.Column(db.Boolean, nullable=False, default=False)
-    #created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    #updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
+    address_id = db.Column(db.Integer, db.ForeignKey("dim_address.id"), nullable=False)
+    contact_id = db.Column(db.Integer, db.ForeignKey("dim_contact.id"), nullable=False)
+    created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 class Product(db.Model):
     __tablename__ = "dim_product"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey("dim_category.id"), nullable=True)
-    supplier_id = db.Column(db.Integer, db.ForeignKey("dim_supplier.id"), nullable=True)
-    price = db.Column(db.Float, nullable=False)
-    stock_quantity = db.Column(db.Integer, nullable=False, default=0)
-
-    # Relationships
-    category = db.relationship("Category", backref=db.backref("products", lazy=True))
-    supplier = db.relationship("Supplier", backref=db.backref("products", lazy=True))
+    category_label = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.String(1000), nullable=False)
+    quantity_available = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
-class Transaction(db.Model):
-    __tablename__ = "fact_transaction"
+class Order(db.Model):
+    __tablename__ = "fact_order"
 
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey("dim_product.id"), nullable=False)
-    transaction_type = db.Column(db.String(10), nullable=False)  # "IN" or "OUT"
+    partner_id = db.Column(db.Integer, db.ForeignKey("dim_partner.id"), nullable=False)
+    warehouse_id = db.Column(db.Integer, db.ForeignKey("dim_warehouse.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    transaction_date = db.Column(db.DateTime, default=datetime.utcnow)
+    unit_price = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
+    deleted = db.Column(db.Boolean, default=False, nullable=False)
 
-    # Relationships
-    product = db.relationship("Product", backref=db.backref("transactions", lazy=True))
