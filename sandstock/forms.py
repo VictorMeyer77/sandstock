@@ -31,6 +31,19 @@ class PartnerForm(FlaskForm):
     country = StringField("Country", validators=[DataRequired()])
     submit = SubmitField("Add Partner")
 
+
+class WarehouseForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    contact_person = StringField("Contact Person")
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    phone_number = StringField("Phone Number")
+    street_address = StringField("Street Address", validators=[DataRequired()])
+    city = StringField("City", validators=[DataRequired()])
+    state = StringField("State", validators=[DataRequired()])
+    postal_code = StringField("Postal Code", validators=[DataRequired()])
+    country = StringField("Country", validators=[DataRequired()])
+    submit = SubmitField("Add Warehouse")
+
 class ProductForm(FlaskForm):
     new_category = StringField("New Category")
     new_supplier = StringField("New Supplier")

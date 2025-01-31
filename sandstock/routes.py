@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
-from sandstock.models import db, User, Order, Contact, Address, Partner
-from sandstock.forms import RegisterForm, LoginForm, PartnerForm
+from sandstock.models import db, User, Order, Contact, Address, Partner, Warehouse
+from sandstock.forms import RegisterForm, LoginForm, PartnerForm, WarehouseForm
 
 
 def register_routes(app: Flask):
@@ -90,3 +90,35 @@ def register_routes(app: Flask):
             return redirect(url_for("add_partner"))
 
         return render_template("add_partner.html", form=form)
+
+    @app.route("/add_warehouse", methods=["GET", "POST"])
+    @login_required
+    def add_warehouse():
+        form = WarehouseForm()
+        if form.validate_on_submit():
+            contact = Contact(email=form.email.data, phone_number=form.phone_number.data)
+            db.session.add(contact)
+            db.session.commit()
+
+            address = Address(
+                street_address=form.street_address.data,
+                city=form.city.data,
+                state=form.state.data,
+                postal_code=form.postal_code.data,
+                country=form.country.data
+            )
+            db.session.add(address)
+            db.session.commit()
+
+            warehouse = Warehouse(
+                name=form.name.data,
+                address_id=address.id,
+                contact_id=contact.id
+            )
+            db.session.add(warehouse)
+            db.session.commit()
+
+            flash("Warehouse added successfully!", "success")
+            return redirect(url_for("add_warehouse"))
+
+        return render_template("add_warehouse.html", form=form)
