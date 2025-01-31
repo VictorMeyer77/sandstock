@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.fields.choices import SelectField
 from wtforms.fields.numeric import IntegerField
+from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
 class LoginForm(FlaskForm):
@@ -45,11 +46,9 @@ class WarehouseForm(FlaskForm):
     submit = SubmitField("Add Warehouse")
 
 class ProductForm(FlaskForm):
-    new_category = StringField("New Category")
-    new_supplier = StringField("New Supplier")
-    supplier_contact = StringField("Supplier Contact Info")
-    new_product = StringField("New Product", validators=[DataRequired()])
-    product_price = IntegerField("Product Price", validators=[DataRequired()])
+    name = StringField("Name", validators=[DataRequired()])
+    category_label = StringField("Category Label", validators=[DataRequired()])
+    description = StringField("Description", validators=[DataRequired()])
     submit = SubmitField("Add Product")
 
 class TransactionForm(FlaskForm):

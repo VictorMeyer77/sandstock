@@ -1,43 +1,27 @@
 {% extends "base.html" %}
 {% block title %}Add Product{% endblock %}
 {% block content %}
-<body>
-    <div class="container mt-4">
-        <h1>Add New Product</h1>
-        <form method="POST">
+<div class="container">
+    <div class="card">
+        <h1>Add Product</h1>
+        <form method="POST" action="{{ url_for('add_product') }}">
             {{ form.hidden_tag() }}
-
-            <div class="mb-3">
-                {{ form.new_category.label(class="form-label") }}
-                {{ form.new_category(class="form-control") }}
+            <div class="form-group">
+                {{ form.name.label }}<br>
+                {{ form.name(class="form-control", size=32) }}
             </div>
-
-            <div class="mb-3">
-                {{ form.new_supplier.label(class="form-label") }}
-                {{ form.new_supplier(class="form-control") }}
+            <div class="form-group">
+                {{ form.category_label.label }}<br>
+                {{ form.category_label(class="form-control", size=32) }}
             </div>
-
-            <div class="mb-3">
-                {{ form.supplier_contact.label(class="form-label") }}
-                {{ form.supplier_contact(class="form-control") }}
+            <div class="form-group">
+                {{ form.description.label }}<br>
+                {{ form.description(class="form-control", rows=5) }}
             </div>
-
-            <div class="mb-3">
-                {{ form.new_product.label(class="form-label") }}
-                {{ form.new_product(class="form-control") }}
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
             </div>
-
-            <div class="mb-3">
-                {{ form.product_price.label(class="form-label") }}
-                {{ form.product_price(class="form-control") }}
-            </div>
-
-            <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
         </form>
-
-        <hr>
-        <a href="{{ url_for('add_transaction') }}" class="btn btn-secondary">Add Transaction</a>
     </div>
-</body>
-</html>
+</div>
 {% endblock %}

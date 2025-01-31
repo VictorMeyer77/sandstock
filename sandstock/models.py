@@ -77,7 +77,7 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     category_label = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.String(1000), nullable=False)
+    description = db.Column(db.String(500), nullable=False)
     quantity_available = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
