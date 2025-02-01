@@ -215,3 +215,14 @@ footer {
     border-color: #d6d8db;
     color: #383d41;
 }
+
+/* === TABLE ROW STYLES === */
+.table-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.table-column {
+    flex: 1;
+}

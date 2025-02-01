@@ -3,66 +3,74 @@
 {% block content %}
 <body>
     <div class="container">
-        <h1>Partners</h1>
-        <input type="text" id="partner-search" placeholder="Search Partners">
-        <table id="partner-table" class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for partner in partners %}
-                    <tr>
-                        <td>{{ partner.id }}</td>
-                        <td>{{ partner.name }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-row">
+            <div class="table-column">
+                <h1>Partners</h1>
+                <input type="text" id="partner-search" placeholder="Search Partners">
+                <table id="partner-table" class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for partner in partners %}
+                            <tr>
+                                <td>{{ partner.id }}</td>
+                                <td>{{ partner.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-        <h1>Warehouses</h1>
-        <input type="text" id="warehouse-search" placeholder="Search Warehouses">
-        <table id="warehouse-table" class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for warehouse in warehouses %}
-                    <tr>
-                        <td>{{ warehouse.id }}</td>
-                        <td>{{ warehouse.name }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            <div class="table-column">
+                <h1>Warehouses</h1>
+                <input type="text" id="warehouse-search" placeholder="Search Warehouses">
+                <table id="warehouse-table" class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for warehouse in warehouses %}
+                            <tr>
+                                <td>{{ warehouse.id }}</td>
+                                <td>{{ warehouse.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-        <h1>Products</h1>
-        <input type="text" id="product-search" placeholder="Search Products">
-        <table id="product-table" class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Category Label</th>
-                    <th>Quantity Available</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                    <tr>
-                        <td>{{ product.id }}</td>
-                        <td>{{ product.name }}</td>
-                        <td>{{ product.category_label }}</td>
-                        <td>{{ product.quantity_available }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            <div class="table-column">
+                <h1>Products</h1>
+                <input type="text" id="product-search" placeholder="Search Products">
+                <table id="product-table" class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category Label</th>
+                            <th>Quantity Available</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>{{ product.id }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.category_label }}</td>
+                                <td>{{ product.quantity_available }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
