@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.fields.choices import SelectField
+from wtforms.fields.datetime import DateTimeLocalField
 from wtforms.fields.numeric import IntegerField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
@@ -18,7 +19,6 @@ class RegisterForm(FlaskForm):
         DataRequired(), EqualTo("password", message="Passwords must match!")
     ])
     submit = SubmitField("Register")
-
 
 class PartnerForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
@@ -45,11 +45,20 @@ class WarehouseForm(FlaskForm):
     country = StringField("Country", validators=[DataRequired()])
     submit = SubmitField("Add Warehouse")
 
-class ProductForm(FlaskForm):
+class CreateProductForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     category_label = StringField("Category Label", validators=[DataRequired()])
     description = StringField("Description", validators=[DataRequired()])
     submit = SubmitField("Add Product")
+
+class UpdateProductForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    category_label = StringField("Category Label", validators=[DataRequired()])
+    description = TextAreaField("Description", validators=[DataRequired()])
+    quantity_available = IntegerField("Quantity Available", validators=[DataRequired()], render_kw={'readonly': True})
+    created_at = DateTimeLocalField("Created At", format='%Y-%m-%dT%H:%M', render_kw={'readonly': True})
+    updated_at = DateTimeLocalField("Updated At", format='%Y-%m-%dT%H:%M', render_kw={'readonly': True})
+    submit = SubmitField("Update Product")
 
 class TransactionForm(FlaskForm):
     product_id = SelectField("Product", coerce=int, validators=[DataRequired()])

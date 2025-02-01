@@ -226,3 +226,19 @@ footer {
 .table-column {
     flex: 1;
 }
+
+/* === SEARCH BAR STYLES === */
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.search-bar input {
+    flex: 1;
+}
+
+.search-bar button {
+    margin-left: auto;
+}
