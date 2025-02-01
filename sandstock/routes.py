@@ -1,7 +1,16 @@
-from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
-from flask_login import login_user, logout_user, login_required
-from sandstock.models import db, User, Order, Contact, Address, Partner, Warehouse, Product
-from sandstock.forms import RegisterForm, LoginForm, PartnerForm, WarehouseForm, CreateProductForm, UpdateProductForm
+from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
+from flask_login import login_required, login_user, logout_user
+
+from sandstock.forms import (
+    CreateProductForm,
+    LoginForm,
+    PartnerForm,
+    RegisterForm,
+    UpdateProductForm,
+    UpdateWarehouseForm,
+    WarehouseForm,
+)
+from sandstock.models import Address, Contact, Order, Partner, Product, User, Warehouse, db
 
 
 def register_routes(app: Flask):
@@ -27,7 +36,6 @@ def register_routes(app: Flask):
                 return redirect(url_for("login"))
         return render_template("register.html", form=form)
 
-
     @app.route("/login", methods=["GET", "POST"])
     def login():
         form = LoginForm()
@@ -41,7 +49,6 @@ def register_routes(app: Flask):
                 flash("Invalid email or password!", "danger")
         return render_template("login.html", form=form)
 
-
     @app.route("/logout")
     @login_required
     def logout():
@@ -50,7 +57,7 @@ def register_routes(app: Flask):
         return redirect(url_for("login"))
 
     @app.route("/")
-    #@login_required
+    # @login_required
     def home():
         partners = Partner.query.limit(20).all()
         warehouses = Warehouse.query.limit(20).all()
@@ -58,7 +65,7 @@ def register_routes(app: Flask):
         return render_template("home.html", partners=partners, warehouses=warehouses, products=products)
 
     @app.route("/add_partner", methods=["GET", "POST"])
-    #@login_required
+    # @login_required
     def add_partner():
         form = PartnerForm()
         if form.validate_on_submit():
@@ -71,7 +78,7 @@ def register_routes(app: Flask):
                 city=form.city.data,
                 state=form.state.data,
                 postal_code=form.postal_code.data,
-                country=form.country.data
+                country=form.country.data,
             )
             db.session.add(address)
             db.session.commit()
@@ -80,7 +87,7 @@ def register_routes(app: Flask):
                 name=form.name.data,
                 contact_person=form.contact_person.data,
                 address_id=address.id,
-                contact_id=contact.id
+                contact_id=contact.id,
             )
             db.session.add(partner)
             db.session.commit()
@@ -91,7 +98,7 @@ def register_routes(app: Flask):
         return render_template("add_partner.html", form=form)
 
     @app.route("/add_warehouse", methods=["GET", "POST"])
-    #@login_required
+    # @login_required
     def add_warehouse():
         form = WarehouseForm()
         if form.validate_on_submit():
@@ -104,16 +111,12 @@ def register_routes(app: Flask):
                 city=form.city.data,
                 state=form.state.data,
                 postal_code=form.postal_code.data,
-                country=form.country.data
+                country=form.country.data,
             )
             db.session.add(address)
             db.session.commit()
 
-            warehouse = Warehouse(
-                name=form.name.data,
-                address_id=address.id,
-                contact_id=contact.id
-            )
+            warehouse = Warehouse(name=form.name.data, address_id=address.id, contact_id=contact.id)
             db.session.add(warehouse)
             db.session.commit()
 
@@ -122,8 +125,51 @@ def register_routes(app: Flask):
 
         return render_template("add_warehouse.html", form=form)
 
+    @app.route("/warehouse/<int:warehouse_id>/edit", methods=["GET", "POST"])
+    # @login_required
+    def edit_warehouse(warehouse_id):
+        warehouse = Warehouse.query.get_or_404(warehouse_id)
+        contact = Contact.query.get_or_404(warehouse.contact_id)
+        address = Address.query.get_or_404(warehouse.address_id)
+        form = UpdateWarehouseForm(
+            name=warehouse.name,
+            email=contact.email,
+            phone_number=contact.phone_number,
+            street_address=address.street_address,
+            city=address.city,
+            state=address.state,
+            postal_code=address.postal_code,
+            country=address.country,
+            created_at=warehouse.created_at,
+            updated_at=warehouse.updated_at,
+        )
+
+        if form.validate_on_submit():
+            warehouse.name = form.name.data
+            contact.email = form.email.data
+            contact.phone_number = form.phone_number.data
+            address.street_address = form.street_address.data
+            address.city = form.city.data
+            address.state = form.state.data
+            address.postal_code = form.postal_code.data
+            address.country = form.country.data
+            db.session.commit()
+            flash("Warehouse updated successfully!", "success")
+            return redirect(url_for("edit_warehouse", warehouse_id=warehouse.id))
+
+        return render_template("edit_warehouse.html", form=form, warehouse=warehouse)
+
+    @app.route("/warehouse/<int:warehouse_id>/delete", methods=["POST"])
+    # @login_required
+    def delete_warehouse(warehouse_id):
+        warehouse = Warehouse.query.get_or_404(warehouse_id)
+        warehouse.deleted = True
+        db.session.commit()
+        flash("Warehouse deleted successfully!", "success")
+        return redirect(url_for("home"))
+
     @app.route("/add_product", methods=["GET", "POST"])
-    #@login_required
+    # @login_required
     def add_product():
         form = CreateProductForm()
         if form.validate_on_submit():
@@ -131,7 +177,7 @@ def register_routes(app: Flask):
                 name=form.name.data,
                 category_label=form.category_label.data,
                 description=form.description.data,
-                quantity_available=0
+                quantity_available=0,
             )
             db.session.add(product)
             db.session.commit()
@@ -140,7 +186,7 @@ def register_routes(app: Flask):
         return render_template("add_product.html", form=form)
 
     @app.route("/product/<int:product_id>/edit", methods=["GET", "POST"])
-    #@login_required
+    # @login_required
     def edit_product(product_id):
         product = Product.query.get_or_404(product_id)
         form = UpdateProductForm(obj=product)
@@ -154,7 +200,7 @@ def register_routes(app: Flask):
         return render_template("edit_product.html", form=form, product=product)
 
     @app.route("/product/<int:product_id>/delete", methods=["POST"])
-    #@login_required
+    # @login_required
     def delete_product(product_id):
         product = Product.query.get_or_404(product_id)
         product.deleted = True
@@ -163,7 +209,7 @@ def register_routes(app: Flask):
         return redirect(url_for("home"))
 
     @app.route("/search_partners", methods=["GET"])
-    #@login_required
+    # @login_required
     def search_partners():
         query = request.args.get("query", "")
         results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), Partner.deleted == False).limit(20).all()
@@ -176,14 +222,14 @@ def register_routes(app: Flask):
                 "contact_id": partner.contact_id,
                 "created_at": partner.created_at,
                 "updated_at": partner.updated_at,
-                "deleted": partner.deleted
+                "deleted": partner.deleted,
             }
             for partner in results
         ]
         return jsonify(partners)
 
     @app.route("/search_warehouses", methods=["GET"])
-    #@login_required
+    # @login_required
     def search_warehouses():
         query = request.args.get("query", "")
         results = Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted == False).limit(20).all()
@@ -195,14 +241,14 @@ def register_routes(app: Flask):
                 "contact_id": warehouse.contact_id,
                 "created_at": warehouse.created_at,
                 "updated_at": warehouse.updated_at,
-                "deleted": warehouse.deleted
+                "deleted": warehouse.deleted,
             }
             for warehouse in results
         ]
         return jsonify(warehouses)
 
     @app.route("/search_products", methods=["GET"])
-    #@login_required
+    # @login_required
     def search_products():
         query = request.args.get("query", "")
         results = Product.query.filter(Product.name.ilike(f"%{query}%"), Product.deleted == False).limit(20).all()
@@ -215,7 +261,7 @@ def register_routes(app: Flask):
                 "quantity_available": product.quantity_available,
                 "created_at": product.created_at,
                 "updated_at": product.updated_at,
-                "deleted": product.deleted
+                "deleted": product.deleted,
             }
             for product in results
         ]

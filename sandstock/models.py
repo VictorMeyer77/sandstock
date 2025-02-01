@@ -1,9 +1,11 @@
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+
 from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import check_password_hash, generate_password_hash
 
 db = SQLAlchemy()
+
 
 class User(db.Model, UserMixin):
     __tablename__ = "dim_user"
@@ -21,6 +23,7 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
 
 class Contact(db.Model):
     __tablename__ = "dim_contact"
@@ -71,6 +74,7 @@ class Warehouse(db.Model):
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
+
 class Product(db.Model):
     __tablename__ = "dim_product"
 
@@ -95,4 +99,3 @@ class Order(db.Model):
     unit_price = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
-
