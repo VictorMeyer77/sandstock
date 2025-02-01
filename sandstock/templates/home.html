@@ -2,40 +2,104 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 <body>
-    <div class="container mt-4">
-        <h1 class="mb-4">Recent Transactions</h1>
-        <table class="table table-striped">
+    <div class="container">
+        <h1>Partners</h1>
+        <input type="text" id="partner-search" placeholder="Search Partners">
+        <table id="partner-table" class="table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Product</th>
-                    <th>Transaction Type</th>
-                    <th>Quantity</th>
-                    <th>Date</th>
+                    <th>ID</th>
+                    <th>Name</th>
                 </tr>
             </thead>
             <tbody>
-                {% for transaction in transactions %}
+                {% for partner in partners %}
                     <tr>
-                        <td>{{ transaction.id }}</td>
-                        <td>{{ transaction.product.name }}</td>
-                        <td>
-                            {% if transaction.transaction_type == 'IN' %}
-                                <span class="badge bg-success">IN</span>
-                            {% else %}
-                                <span class="badge bg-danger">OUT</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ transaction.quantity }}</td>
-                        <td>{{ transaction.transaction_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ partner.id }}</td>
+                        <td>{{ partner.name }}</td>
                     </tr>
-                {% else %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h1>Warehouses</h1>
+        <input type="text" id="warehouse-search" placeholder="Search Warehouses">
+        <table id="warehouse-table" class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for warehouse in warehouses %}
                     <tr>
-                        <td colspan="5" class="text-center">No transactions found.</td>
+                        <td>{{ warehouse.id }}</td>
+                        <td>{{ warehouse.name }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h1>Products</h1>
+        <input type="text" id="product-search" placeholder="Search Products">
+        <table id="product-table" class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Category Label</th>
+                    <th>Quantity Available</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.category_label }}</td>
+                        <td>{{ product.quantity_available }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            function search(endpoint, inputId, tableId) {
+                $(inputId).on('input', function() {
+                    var query = $(this).val();
+                    $.ajax({
+                        url: endpoint,
+                        method: "GET",
+                        data: { query: query },
+                        success: function(data) {
+                            var tableBody = $(tableId).find('tbody');
+                            tableBody.empty();
+                            data.forEach(function(item) {
+                                var row = '<tr>';
+                                row += '<td>' + item.id + '</td>';
+                                row += '<td>' + item.name + '</td>';
+                                if (tableId === "#product-table") {
+                                    row += '<td>' + item.category_label + '</td>';
+                                    row += '<td>' + item.quantity_available + '</td>';
+                                }
+                                row += '</tr>';
+                                tableBody.append(row);
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("AJAX Error:", status, error);
+                        }
+                    });
+                });
+            }
+
+            search("{{ url_for('search_partners') }}", "#partner-search", "#partner-table");
+            search("{{ url_for('search_warehouses') }}", "#warehouse-search", "#warehouse-table");
+            search("{{ url_for('search_products') }}", "#product-search", "#product-table");
+        });
+    </script>
 </body>
 {% endblock %}
