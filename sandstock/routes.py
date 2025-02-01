@@ -2,15 +2,16 @@ from flask import Flask, flash, jsonify, redirect, render_template, request, url
 from flask_login import login_required, login_user, logout_user
 
 from sandstock.forms import (
+    CreatePartnerForm,
     CreateProductForm,
+    CreateWarehouseForm,
     LoginForm,
-    PartnerForm,
     RegisterForm,
+    UpdatePartnerForm,
     UpdateProductForm,
     UpdateWarehouseForm,
-    WarehouseForm,
 )
-from sandstock.models import Address, Contact, Order, Partner, Product, User, Warehouse, db
+from sandstock.models import Address, Contact, Partner, Product, User, Warehouse, db
 
 
 def register_routes(app: Flask):
@@ -59,15 +60,15 @@ def register_routes(app: Flask):
     @app.route("/")
     # @login_required
     def home():
-        partners = Partner.query.limit(20).all()
-        warehouses = Warehouse.query.limit(20).all()
-        products = Product.query.limit(20).all()
+        partners = Partner.query.filter_by(deleted=False).limit(10).all()
+        warehouses = Warehouse.query.filter_by(deleted=False).limit(10).all()
+        products = Product.query.filter_by(deleted=False).limit(10).all()
         return render_template("home.html", partners=partners, warehouses=warehouses, products=products)
 
     @app.route("/add_partner", methods=["GET", "POST"])
     # @login_required
     def add_partner():
-        form = PartnerForm()
+        form = CreatePartnerForm()
         if form.validate_on_submit():
             contact = Contact(email=form.email.data, phone_number=form.phone_number.data)
             db.session.add(contact)
@@ -97,10 +98,59 @@ def register_routes(app: Flask):
 
         return render_template("add_partner.html", form=form)
 
+    @app.route("/partner/<int:partner_id>/edit", methods=["GET", "POST"])
+    # @login_required
+    def edit_partner(partner_id):
+        partner = Partner.query.get_or_404(partner_id)
+        contact = Contact.query.get_or_404(partner.contact_id)
+        address = Address.query.get_or_404(partner.address_id)
+
+        form = UpdatePartnerForm(
+            name=partner.name,
+            contact_person=partner.contact_person,
+            email=contact.email,
+            phone_number=contact.phone_number,
+            street_address=address.street_address,
+            city=address.city,
+            state=address.state,
+            postal_code=address.postal_code,
+            country=address.country,
+            created_at=partner.created_at,
+            updated_at=partner.updated_at,
+        )
+
+        if form.validate_on_submit():
+            partner.name = form.name.data
+            partner.contact_person = form.contact_person.data
+
+            contact.email = form.email.data
+            contact.phone_number = form.phone_number.data
+
+            address.street_address = form.street_address.data
+            address.city = form.city.data
+            address.state = form.state.data
+            address.postal_code = form.postal_code.data
+            address.country = form.country.data
+
+            db.session.commit()
+            flash("Partner updated successfully!", "success")
+            return redirect(url_for("edit_partner", partner_id=partner.id))
+
+        return render_template("edit_partner.html", form=form, partner=partner)
+
+    @app.route("/partner/<int:partner_id>/delete", methods=["POST"])
+    # @login_required
+    def delete_partner(partner_id):
+        partner = Partner.query.get_or_404(partner_id)
+        partner.deleted = True
+        db.session.commit()
+        flash("Partner deleted successfully!", "success")
+        return redirect(url_for("home"))
+
     @app.route("/add_warehouse", methods=["GET", "POST"])
     # @login_required
     def add_warehouse():
-        form = WarehouseForm()
+        form = CreateWarehouseForm()
         if form.validate_on_submit():
             contact = Contact(email=form.email.data, phone_number=form.phone_number.data)
             db.session.add(contact)
@@ -212,7 +262,7 @@ def register_routes(app: Flask):
     # @login_required
     def search_partners():
         query = request.args.get("query", "")
-        results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), Partner.deleted == False).limit(20).all()
+        results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), not Partner.deleted).limit(20).all()
         partners = [
             {
                 "id": partner.id,
@@ -232,7 +282,7 @@ def register_routes(app: Flask):
     # @login_required
     def search_warehouses():
         query = request.args.get("query", "")
-        results = Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted == False).limit(20).all()
+        results = Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), not Warehouse.deleted).limit(20).all()
         warehouses = [
             {
                 "id": warehouse.id,
@@ -251,7 +301,7 @@ def register_routes(app: Flask):
     # @login_required
     def search_products():
         query = request.args.get("query", "")
-        results = Product.query.filter(Product.name.ilike(f"%{query}%"), Product.deleted == False).limit(20).all()
+        results = Product.query.filter(Product.name.ilike(f"%{query}%"), not Product.deleted).limit(20).all()
         products = [
             {
                 "id": product.id,

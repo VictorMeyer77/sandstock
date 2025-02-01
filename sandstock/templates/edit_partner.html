@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Edit Partner{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="card">
+        <h1>Edit Partner</h1>
+        <form method="POST" action="{{ url_for('edit_partner', partner_id=partner.id) }}">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.name.label }}<br>
+                {{ form.name(class="form-control", size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.contact_person.label }}<br>
+                {{ form.contact_person(class="form-control", size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.email.label }}<br>
+                {{ form.email(class="form-control", size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.phone_number.label }}<br>
+                {{ form.phone_number(class="form-control", size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.street_address.label }}<br>
+                {{ form.street_address(class="form-control", size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.city.label }}<br>
+                {{ form.city(class="form-control", size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.state.label }}<br>
+                {{ form.state(class="form-control", size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.postal_code.label }}<br>
+                {{ form.postal_code(class="form-control", size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.country.label }}<br>
+                {{ form.country(class="form-control", size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.created_at.label }}<br>
+                {{ form.created_at(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.updated_at.label }}<br>
+                {{ form.updated_at(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+        <form method="POST" action="{{ url_for('delete_partner', partner_id=partner.id) }}" style="display:inline;">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this partner?')">Delete Partner</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

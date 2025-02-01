@@ -23,7 +23,7 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Register")
 
 
-class PartnerForm(FlaskForm):
+class CreatePartnerForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     contact_person = StringField("Contact Person")
     email = StringField("Email", validators=[DataRequired(), Email()])
@@ -36,7 +36,22 @@ class PartnerForm(FlaskForm):
     submit = SubmitField("Add Partner")
 
 
-class WarehouseForm(FlaskForm):
+class UpdatePartnerForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    contact_person = StringField("Contact Person", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    phone_number = StringField("Phone Number")
+    street_address = StringField("Street Address", validators=[DataRequired()])
+    city = StringField("City", validators=[DataRequired()])
+    state = StringField("State", validators=[DataRequired()])
+    postal_code = StringField("Postal Code", validators=[DataRequired()])
+    country = StringField("Country", validators=[DataRequired()])
+    created_at = DateTimeLocalField("Created At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
+    updated_at = DateTimeLocalField("Updated At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
+    submit = SubmitField("Update Partner")
+
+
+class CreateWarehouseForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
     phone_number = StringField("Phone Number")
