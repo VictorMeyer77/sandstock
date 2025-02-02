@@ -10,6 +10,7 @@ from sandstock.forms import (
     CreateWarehouseForm,
     LoginForm,
     RegisterForm,
+    UpdateOrderForm,
     UpdatePartnerForm,
     UpdateProductForm,
     UpdateWarehouseForm,
@@ -63,10 +64,11 @@ def register_routes(app: Flask):
     @app.route("/")
     # @login_required
     def home():
+        orders = Order.query.filter_by(deleted=False).limit(10).all()
         partners = Partner.query.filter_by(deleted=False).limit(10).all()
         warehouses = Warehouse.query.filter_by(deleted=False).limit(10).all()
         products = Product.query.filter_by(deleted=False).limit(10).all()
-        return render_template("home.html", partners=partners, warehouses=warehouses, products=products)
+        return render_template("home.html", partners=partners, warehouses=warehouses, products=products, orders=orders)
 
     # Partner
 
@@ -362,3 +364,42 @@ def register_routes(app: Flask):
             return redirect(url_for("add_order"))
 
         return render_template("add_order.html", form=form)
+
+    @app.route("/order/get", methods=["GET"])
+    # @login_required
+    def get_orders():
+        query = request.args.get("query", "")
+        results = Order.query.filter(Order.id.ilike(f"%{query}%"), Order.deleted == False).limit(10).all()
+        orders = [
+            {
+                "id": order.id,
+                "product_id": order.product_id,
+                "partner_id": order.partner_id,
+                "warehouse_id": order.warehouse_id,
+                "quantity": order.quantity,
+                "unit_price": order.unit_price,
+                "created_at": order.created_at,
+                "deleted": order.deleted,
+            }
+            for order in results
+        ]
+        return jsonify(orders)
+
+    @app.route("/order/<int:order_id>/edit", methods=["GET"])
+    # @login_required
+    def edit_order(order_id):
+        order = Order.query.get_or_404(order_id)
+        product = Product.query.get_or_404(order.product_id)
+        partner = Partner.query.get_or_404(order.partner_id)
+        warehouse = Warehouse.query.get_or_404(order.warehouse_id)
+
+        form = UpdateOrderForm(
+            id=order.id,
+            product_name=product.name,
+            partner_name=partner.name,
+            warehouse_name=warehouse.name,
+            quantity=order.quantity,
+            unit_price=order.unit_price,
+            created_at=order.created_at,
+        )
+        return render_template("edit_order.html", form=form, order=order)

@@ -105,3 +105,14 @@ class CreateOrderForm(FlaskForm):
     def validate_unit_price(self, field):
         if field.data <= 0:
             raise ValidationError("Price must be greater than 0.")
+
+
+class UpdateOrderForm(FlaskForm):
+    id = IntegerField("Order ID", render_kw={"readonly": True})
+    product_name = StringField("Product", validators=[DataRequired()])
+    partner_name = StringField("Partner", validators=[DataRequired()])
+    warehouse_name = StringField("Warehouse", validators=[DataRequired()])
+    quantity = IntegerField("Quantity", validators=[DataRequired()], render_kw={"readonly": True})
+    unit_price = FloatField("Unit Price", validators=[DataRequired()], render_kw={"readonly": True})
+    created_at = DateTimeLocalField("Created At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
+    submit = SubmitField("Update Order", render_kw={"disabled": True})

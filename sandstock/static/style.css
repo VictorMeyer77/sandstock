@@ -247,7 +247,6 @@ footer {
     background-color: #357ab7;
 }
 
-
 /* === ALERT STYLES === */
 .alert {
     margin-bottom: 20px;
@@ -278,64 +277,6 @@ footer {
     color: #383d41;
 }
 
-/* === TABLE ROW STYLES === */
-.table-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 25px;
-}
-
-.table-column {
-    flex: 1;
-}
-
-/* === SEARCH BAR STYLES === */
-.search-bar {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.search-bar input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-}
-
-.search-bar button {
-    padding: 12px 18px;
-    background-color: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.search-bar button:hover {
-    background-color: #357ab7;
-}
-
-/* === SELECT BOX STYLES === */
-.select-box {
-    background: #ffffff;
-    color: #2d3748;
-    border: 1px solid #e2e8f0;
-    padding: 12px;
-    border-radius: 8px;
-    transition: 0.3s ease-in-out;
-    width: 100%;
-    appearance: none;
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-}
-
-.select-box:focus {
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
-}
-
 /* === HR STYLES === */
 hr {
     border: none;
@@ -344,4 +285,35 @@ hr {
     margin: 20px 0;
     opacity: 0.8;
     border-radius: 2px;
+}
+
+/* === FORM GROUP INLINE STYLES === */
+.form-group-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-group-inline .input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.form-group-inline .input-group .form-control {
+    flex: 1;
+}
+
+.form-group-inline .input-group .btn {
+    padding: 10px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.form-group-inline .input-group .btn:hover {
+    background-color: #357ab7;
 }

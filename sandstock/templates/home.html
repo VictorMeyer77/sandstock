@@ -3,6 +3,47 @@
 {% block content %}
 <body>
     <div class="container">
+
+<!-- Orders Table -->
+        <div class="table-container">
+            <h1>Orders</h1>
+            <div class="search-bar">
+                <input type="text" id="order-search" placeholder="Search Orders">
+                <button class="btn btn-primary" onclick="location.href='{{ url_for('add_order') }}'"><i class="fas fa-plus"></i></button>
+            </div>
+            <table id="order-table" class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Product</th>
+                        <th>Partner</th>
+                        <th>Warehouse</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.product_id }}</td>
+                            <td>{{ order.partner_id }}</td>
+                            <td>{{ order.warehouse_id }}</td>
+                            <td>{{ order.quantity }}</td>
+                            <td>${{ order.unit_price }}</td>
+                            <td>
+                                <a href="{{ url_for('edit_order', order_id=order.id) }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Products Table -->
         <div class="table-container">
             <h1>Products</h1>
             <div class="search-bar">
@@ -22,10 +63,10 @@
                 <tbody>
                     {% for product in products %}
                         <tr>
-                            <td data-label="ID">{{ product.id }}</td>
-                            <td data-label="Name">{{ product.name }}</td>
-                            <td data-label="Category">{{ product.category_label }}</td>
-                            <td data-label="Quantity">{{ product.quantity_available }}</td>
+                            <td>{{ product.id }}</td>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.category_label }}</td>
+                            <td>{{ product.quantity_available }}</td>
                             <td>
                                 <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-edit"></i>
@@ -36,6 +77,8 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Partners Table -->
         <div class="table-container">
             <h1>Partners</h1>
             <div class="search-bar">
@@ -53,8 +96,8 @@
                 <tbody>
                     {% for partner in partners %}
                         <tr>
-                            <td data-label="ID">{{ partner.id }}</td>
-                            <td data-label="Name">{{ partner.name }}</td>
+                            <td>{{ partner.id }}</td>
+                            <td>{{ partner.name }}</td>
                             <td>
                                 <a href="{{ url_for('edit_partner', partner_id=partner.id) }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-edit"></i>
@@ -66,6 +109,7 @@
             </table>
         </div>
 
+        <!-- Warehouses Table -->
         <div class="table-container">
             <h1>Warehouses</h1>
             <div class="search-bar">
@@ -83,8 +127,8 @@
                 <tbody>
                     {% for warehouse in warehouses %}
                         <tr>
-                            <td data-label="ID">{{ warehouse.id }}</td>
-                            <td data-label="Name">{{ warehouse.name }}</td>
+                            <td>{{ warehouse.id }}</td>
+                            <td>{{ warehouse.name }}</td>
                             <td>
                                 <a href="{{ url_for('edit_warehouse', warehouse_id=warehouse.id) }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-edit"></i>
@@ -95,56 +139,75 @@
                 </tbody>
             </table>
         </div>
+
+
     </div>
 </body>
 
-    <script>
-        $(document).ready(function() {
-            function search(endpoint, inputId, tableId) {
-                $(inputId).on('input', function() {
-                    var query = $(this).val();
-                    $.ajax({
-                        url: endpoint,
-                        method: "GET",
-                        data: { query: query },
-                        success: function(data) {
-                            var tableBody = $(tableId).find('tbody');
-                            tableBody.empty();
-                            data.forEach(function(item) {
-                                var row = '<tr>';
-                                row += '<td data-label="ID">' + item.id + '</td>';
-                                row += '<td data-label="Name">' + item.name + '</td>';
-                                if (tableId === "#product-table") {
-                                    row += '<td data-label="Category">' + item.category_label + '</td>';
-                                    row += '<td data-label="Quantity">' + item.quantity_available + '</td>';
-                                }
+<script>
+    $(document).ready(function() {
+        function search(endpoint, inputId, tableId) {
+            $(inputId).on('input', function() {
+                var query = $(this).val();
+                $.ajax({
+                    url: endpoint,
+                    method: "GET",
+                    data: { query: query },
+                    success: function(data) {
+                        var tableBody = $(tableId).find('tbody');
+                        tableBody.empty();
+                        data.forEach(function(item) {
+                            var row = "<tr>";
+                            row += "<td>" + item.id + "</td>";
 
-                                row += '<td>';
-                                if (tableId === "#product-table") {
-                                    row += '<a href="/product/' + item.id + '/edit" class="btn btn-primary btn-sm">';
-                                }
-                                else if (tableId === "#partner-table") {
-                                    row += '<a href="/partner/' + item.id + '/edit" class="btn btn-primary btn-sm">';
-                                }
-                                else if (tableId === "#warehouse-table") {
-                                    row += '<a href="/warehouse/' + item.id + '/edit" class="btn btn-primary btn-sm">';
-                                }
-                                row += '<i class="fas fa-edit"></i>';
-                                row += '</td>';
-                                row += '</tr>';
-                                tableBody.append(row);
-                            });
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("AJAX Error:", status, error);
-                        }
-                    });
+                            if (tableId === "#partner-table") {
+                                row += "<td>" + item.name + "</td>";
+                            }
+                            else if (tableId === "#warehouse-table") {
+                                row += "<td>" + item.name + "</td>";
+                            }
+                            else if (tableId === "#product-table") {
+                                row += "<td>" + item.name + "</td>";
+                                row += "<td>" + item.category_label + "</td>";
+                                row += "<td>" + item.quantity_available + "</td>";
+                            } else if (tableId === "#order-table") {
+                                row += "<td>" + item.product_id + "</td>";
+                                row += "<td>" + item.partner_id + "</td>";
+                                row += "<td>" + item.warehouse_id + "</td>";
+                                row += "<td>" + item.quantity + "</td>";
+                                row += "<td>" + item.unit_price + "</td>";
+                            }
+                            row += "<td>";
+                            if (tableId === "#product-table") {
+                                row += '<a href="/product/' + item.id + '/edit" class="btn btn-primary btn-sm">';
+                            }
+                            else if (tableId === "#partner-table") {
+                                row += '<a href="/partner/' + item.id + '/edit" class="btn btn-primary btn-sm">';
+                            }
+                            else if (tableId === "#warehouse-table") {
+                                row += '<a href="/warehouse/' + item.id + '/edit" class="btn btn-primary btn-sm">';
+                            }
+                            else if (tableId === "#order-table") {
+                                row += '<a href="/order/' + item.id + '/edit" class="btn btn-primary btn-sm">';
+                            }
+                            row += '<i class="fas fa-edit"></i>';
+                            row += "</td>";
+                            row += "</tr>";
+
+                            tableBody.append(row);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                    }
                 });
-            }
+            });
+        }
 
-            search("{{ url_for('get_partners') }}", "#partner-search", "#partner-table");
-            search("{{ url_for('get_warehouses') }}", "#warehouse-search", "#warehouse-table");
-            search("{{ url_for('get_products') }}", "#product-search", "#product-table");
-        });
-    </script>
+        search("{{ url_for('get_products') }}", "#product-search", "#product-table");
+        search("{{ url_for('get_partners') }}", "#partner-search", "#partner-table");
+        search("{{ url_for('get_warehouses') }}", "#warehouse-search", "#warehouse-table");
+        search("{{ url_for('get_orders') }}", "#order-search", "#order-table");
+    });
+</script>
 {% endblock %}
