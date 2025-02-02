@@ -335,3 +335,13 @@ footer {
     border-color: #4a90e2;
     box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
 }
+
+/* === HR STYLES === */
+hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(to right, #4a90e2, #357ab7);
+    margin: 20px 0;
+    opacity: 0.8;
+    border-radius: 2px;
+}
