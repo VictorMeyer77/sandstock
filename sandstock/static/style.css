@@ -49,10 +49,11 @@ h1, h2, h3, h4, h5, h6 {
 
 /* === BUTTON STYLES === */
 .btn {
-    font-weight: 600;
-    border-radius: 8px;
-    padding: 12px 25px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 500;
+    border-radius: 4px;  /* Even smaller radius for a more delicate look */
+    padding: 4px 12px;  /* Further reduced padding for a sleeker appearance */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-size: 10px;  /* Smaller font size for a more subtle look */
 }
 
 .btn-primary {
@@ -62,10 +63,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary:hover {
-    background-color: #357ab7;  /* Darker blue on hover */
+    background-color: #357ab7;  /* Slightly darker blue on hover */
     border-color: #357ab7;
-    box-shadow: 0 5px 20px rgba(74, 144, 226, 0.3);
-    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(74, 144, 226, 0.2);  /* Subtle shadow effect */
+    transform: translateY(-1px);  /* Very subtle lift effect */
 }
 
 .btn-danger {
@@ -75,10 +76,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-danger:hover {
-    background-color: #e53935;  /* Darker red on hover */
+    background-color: #e53935;  /* Slightly darker red on hover */
     border-color: #e53935;
-    box-shadow: 0 5px 20px rgba(244, 67, 54, 0.3);
-    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(244, 67, 54, 0.2);  /* Subtle shadow effect */
+    transform: translateY(-1px);  /* Very subtle lift effect */
 }
 
 .btn-success {
@@ -88,10 +89,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-success:hover {
-    background-color: #388e3c;  /* Darker green on hover */
+    background-color: #388e3c;  /* Slightly darker green on hover */
     border-color: #388e3c;
-    box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
-    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(76, 175, 80, 0.2);  /* Subtle shadow effect */
+    transform: translateY(-1px);  /* Very subtle lift effect */
 }
 
 .btn-secondary {
@@ -101,10 +102,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-secondary:hover {
-    background-color: #757575;  /* Darker gray on hover */
+    background-color: #757575;  /* Slightly darker gray on hover */
     border-color: #757575;
-    box-shadow: 0 5px 20px rgba(158, 158, 158, 0.3);
-    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(158, 158, 158, 0.2);  /* Subtle shadow effect */
+    transform: translateY(-1px);  /* Very subtle lift effect */
 }
 
 /* === FORM STYLING === */
@@ -149,18 +150,19 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 25px;
+    font-size: 14px;  /* Smaller font size for table rows */
 }
 
 .table th {
     background-color: #f7fafc;
     color: #4a90e2;
-    padding: 15px;
+    padding: 12px;  /* Slightly smaller padding for headers */
     text-align: left;
     font-weight: 600;
 }
 
 .table td {
-    padding: 15px;
+    padding: 12px;  /* Slightly smaller padding for table cells */
     text-align: left;
     border-bottom: 1px solid #e2e8f0;
 }
