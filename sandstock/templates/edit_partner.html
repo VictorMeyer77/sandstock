@@ -4,6 +4,7 @@
 <div class="container">
     <div class="card">
         <h1>Edit Partner</h1>
+        <hr>
         <form method="POST" action="{{ url_for('edit_partner', partner_id=partner.id) }}">
             {{ form.hidden_tag() }}
             <div class="form-group">

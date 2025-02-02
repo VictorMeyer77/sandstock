@@ -8,7 +8,7 @@
         <div class="table-container">
             <h1>Orders</h1>
             <div class="search-bar">
-                <input type="text" id="order-search" placeholder="Search Orders">
+                <input type="text" id="order-search" placeholder="ID">
                 <button class="btn btn-primary" onclick="location.href='{{ url_for('add_order') }}'"><i class="fas fa-plus"></i></button>
             </div>
             <table id="order-table" class="table">
@@ -45,7 +45,7 @@
         <div class="table-container">
             <h1>Products</h1>
             <div class="search-bar">
-                <input type="text" id="product-search" placeholder="Search Products">
+                <input type="text" id="product-search" placeholder="Name">
                 <button class="btn btn-primary" onclick="location.href='{{ url_for('add_product') }}'"><i class="fas fa-plus"></i></button>
             </div>
             <table id="product-table" class="table">
@@ -80,7 +80,7 @@
         <div class="table-container">
             <h1>Partners</h1>
             <div class="search-bar">
-                <input type="text" id="partner-search" placeholder="Search Partners">
+                <input type="text" id="partner-search" placeholder="Name">
                 <button class="btn btn-primary" onclick="location.href='{{ url_for('add_partner') }}'"><i class="fas fa-plus"></i></button>
             </div>
             <table id="partner-table" class="table">
@@ -111,7 +111,7 @@
         <div class="table-container">
             <h1>Warehouses</h1>
             <div class="search-bar">
-                <input type="text" id="warehouse-search" placeholder="Search Warehouses">
+                <input type="text" id="warehouse-search" placeholder="Name">
                 <button class="btn btn-primary" onclick="location.href='{{ url_for('add_warehouse') }}'"><i class="fas fa-plus"></i></button>
             </div>
             <table id="warehouse-table" class="table">
