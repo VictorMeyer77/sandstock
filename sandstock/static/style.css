@@ -1,38 +1,42 @@
 /* === GENERAL STYLES === */
 body {
-    background-color: #f0f2f5;  /* Light gray background */
-    color: #333;  /* Dark gray text for high readability */
-    font-family: 'Inter', sans-serif;
+    background: linear-gradient(145deg, #e2e8f0, #f0f5f9);  /* Soft gradient background */
+    color: #2d3748;  /* Darker text for better readability */
+    font-family: 'Arial', sans-serif;
     overflow-x: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 /* === HEADINGS === */
 h1, h2, h3, h4, h5, h6 {
-    color: #007bff;  /* Blue highlight */
-    font-weight: 600;
+    color: #1a202c;  /* Darker shade for headings */
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 /* === NAVBAR STYLING === */
 .navbar {
-    background: #007bff;  /* Light blue background */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 10px 20px;
+    background: #4a90e2;  /* Smooth blue background */
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    padding: 12px 30px;
 }
 
 .navbar-brand {
-    color: #ffffff !important;  /* White text */
-    font-size: 1.5rem;
+    color: #ffffff !important;
+    font-size: 1.75rem;
     font-weight: bold;
 }
 
 .navbar-nav .nav-link {
     color: #ffffff !important;
-    transition: color 0.3s ease;
-    margin: 0 10px;
+    transition: color 0.4s ease;
+    margin: 0 15px;
+    text-transform: uppercase;
 }
 
 .navbar-nav .nav-link:hover {
-    color: #0056b3 !important;  /* Darker blue on hover */
+    color: #d1e7ff !important;  /* Light blue hover effect */
 }
 
 .navbar-toggler {
@@ -45,137 +49,143 @@ h1, h2, h3, h4, h5, h6 {
 
 /* === BUTTON STYLES === */
 .btn {
-    font-weight: 500;
-    border-radius: 5px;
-    transition: all 0.3s ease-in-out;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 12px 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .btn-primary {
-    background-color: #007bff;  /* Blue background */
-    border-color: #007bff;
-    color: #ffffff;  /* White text */
+    background-color: #4a90e2;  /* Soft blue background */
+    border-color: #4a90e2;
+    color: #ffffff;
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;  /* Darker blue on hover */
-    border-color: #0056b3;
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    background-color: #357ab7;  /* Darker blue on hover */
+    border-color: #357ab7;
+    box-shadow: 0 5px 20px rgba(74, 144, 226, 0.3);
+    transform: translateY(-2px);
 }
 
 .btn-danger {
-    background-color: #dc3545;  /* Red background */
-    border-color: #dc3545;
-    color: #ffffff;  /* White text */
+    background-color: #f44336;  /* Vibrant red background */
+    border-color: #f44336;
+    color: #ffffff;
 }
 
 .btn-danger:hover {
-    background-color: #c82333;  /* Darker red on hover */
-    border-color: #c82333;
-    box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+    background-color: #e53935;  /* Darker red on hover */
+    border-color: #e53935;
+    box-shadow: 0 5px 20px rgba(244, 67, 54, 0.3);
+    transform: translateY(-2px);
 }
 
 .btn-success {
-    background-color: #28a745;  /* Green background */
-    border-color: #28a745;
-    color: #ffffff;  /* White text */
+    background-color: #4caf50;  /* Fresh green background */
+    border-color: #4caf50;
+    color: #ffffff;
 }
 
 .btn-success:hover {
-    background-color: #218838;  /* Darker green on hover */
-    border-color: #218838;
-    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+    background-color: #388e3c;  /* Darker green on hover */
+    border-color: #388e3c;
+    box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
+    transform: translateY(-2px);
 }
 
 .btn-secondary {
-    background-color: #6c757d;  /* Gray background */
-    border-color: #6c757d;
-    color: #ffffff;  /* White text */
+    background-color: #9e9e9e;  /* Muted gray background */
+    border-color: #9e9e9e;
+    color: #ffffff;
 }
 
 .btn-secondary:hover {
-    background-color: #5a6268;  /* Darker gray on hover */
-    border-color: #5a6268;
-    box-shadow: 0 0 10px rgba(90, 98, 104, 0.5);
+    background-color: #757575;  /* Darker gray on hover */
+    border-color: #757575;
+    box-shadow: 0 5px 20px rgba(158, 158, 158, 0.3);
+    transform: translateY(-2px);
 }
 
 /* === FORM STYLING === */
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .form-control {
-    background: #ffffff;  /* White background */
-    color: #333;  /* Dark gray text */
-    border: 1px solid #ced4da;  /* Light gray border */
-    padding: 10px;
-    border-radius: 5px;
+    background: #ffffff;
+    color: #2d3748;
+    border: 1px solid #e2e8f0;  /* Light gray border */
+    padding: 14px;
+    border-radius: 8px;
     transition: 0.3s ease-in-out;
     width: 100%;
 }
 
 .form-control:focus {
-    border-color: #80bdff;  /* Light blue border on focus */
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #4a90e2;  /* Soft blue border on focus */
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
 }
 
 /* === CARD STYLES (Glassmorphism Effect) === */
 .card {
-    background: rgba(255, 255, 255, 0.9);  /* Semi-transparent white */
-    border-radius: 12px;
-    border: 1px solid #e9ecef;  /* Light gray border */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.85);  /* Semi-transparent white */
+    border-radius: 15px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    margin-bottom: 25px;
+    backdrop-filter: blur(10px);  /* Glassmorphism effect */
 }
 
 .card h2 {
-    color: #007bff;  /* Blue heading */
+    color: #4a90e2;
 }
 
 /* === TABLE STYLES === */
 .table {
     background-color: transparent;
-    color: #333;  /* Dark gray text */
+    color: #2d3748;
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .table th {
-    background-color: #f8f9fa;  /* Light gray background */
-    color: #007bff;  /* Blue text */
-    padding: 10px;
+    background-color: #f7fafc;
+    color: #4a90e2;
+    padding: 15px;
     text-align: left;
+    font-weight: 600;
 }
 
 .table td {
-    padding: 10px;
+    padding: 15px;
     text-align: left;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .table tbody tr:hover {
-    background-color: rgba(0, 123, 255, 0.1);  /* Light blue hover */
+    background-color: rgba(74, 144, 226, 0.05);  /* Subtle hover effect */
 }
 
 /* === FOOTER === */
 footer {
-    background: #007bff;  /* Light blue background */
-    color: #ffffff;  /* White text */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background: #4a90e2;
+    color: #ffffff;
+    box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
-    padding: 20px;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 25px;
 }
 
 /* === SCROLLBAR CUSTOMIZATION === */
 ::-webkit-scrollbar {
-    width: 8px;
-    background-color: #f0f2f5;  /* Light gray background */
+    width: 10px;
+    background-color: #f7fafc;  /* Light background */
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #007bff;  /* Blue thumb */
+    background: #4a90e2;
     border-radius: 10px;
 }
 
@@ -184,16 +194,21 @@ footer {
     .navbar-nav {
         text-align: center;
     }
+
+    .search-bar {
+        flex-direction: column;
+        gap: 5px;
+    }
 }
 
 /* === ALERT STYLES === */
 .alert {
-    margin-bottom: 15px;
-    border-radius: 5px;
+    margin-bottom: 20px;
+    border-radius: 8px;
 }
 
 .alert-success {
-    background-color: #d4edda;
+    background-color: #dff0d8;
     border-color: #c3e6cb;
     color: #155724;
 }
@@ -220,7 +235,7 @@ footer {
 .table-row {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    gap: 25px;
 }
 
 .table-column {
@@ -231,33 +246,45 @@ footer {
 .search-bar {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 15px;
+    margin-bottom: 15px;
 }
 
 .search-bar input {
     flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
 }
 
 .search-bar button {
-    margin-left: auto;
+    padding: 12px 18px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.search-bar button:hover {
+    background-color: #357ab7;
 }
 
 /* === SELECT BOX STYLES === */
 .select-box {
-    background: #ffffff;  /* White background */
-    color: #333;  /* Dark gray text */
-    border: 1px solid #ced4da;  /* Light gray border */
-    padding: 10px;
-    border-radius: 5px;
+    background: #ffffff;
+    color: #2d3748;
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    border-radius: 8px;
     transition: 0.3s ease-in-out;
     width: 100%;
     appearance: none;
     background-repeat: no-repeat;
-    background-position: right 10px center;
+    background-position: right 12px center;
 }
 
 .select-box:focus {
-    border-color: #80bdff;  /* Light blue border on focus */
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
 }

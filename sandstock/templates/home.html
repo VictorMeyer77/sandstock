@@ -120,6 +120,19 @@
                                     row += '<td>' + item.category_label + '</td>';
                                     row += '<td>' + item.quantity_available + '</td>';
                                 }
+
+                                row += '<td>';
+                                if (tableId === "#product-table") {
+                                    row += '<a href="/product/$(item.id)/edit" class="btn btn-primary btn-sm">';
+                                }
+                                else if (tableId === "#partner-table") {
+                                    row += '<a href="/partner/$(item.id)/edit" class="btn btn-primary btn-sm">';
+                                }
+                                else if (tableId === "#warehouse-table") {
+                                    row += '<a href="/warehouse/$(item.id)/edit" class="btn btn-primary btn-sm">';
+                                }
+                                row += '<i class="fas fa-edit"></i>';
+                                row += '</td>';
                                 row += '</tr>';
                                 tableBody.append(row);
                             });
