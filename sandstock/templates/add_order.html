@@ -37,6 +37,15 @@
             <div class="form-group">
                 {{ form.unit_price.label }}<br>
                 {{ form.unit_price(class="form-control", size=32) }}
+                {% if form.unit_price.errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for error in form.unit_price.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
             </div>
             <div class="form-group">
                 {{ form.submit(class="btn btn-primary") }}
