@@ -15,11 +15,10 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Product</th>
-                        <th>Partner</th>
-                        <th>Warehouse</th>
+                        <th>Category</th>
                         <th>Quantity</th>
                         <th>Unit Price</th>
+                        <th>Currency</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -27,11 +26,10 @@
                     {% for order in orders %}
                         <tr>
                             <td>{{ order.id }}</td>
-                            <td>{{ order.product_id }}</td>
-                            <td>{{ order.partner_id }}</td>
-                            <td>{{ order.warehouse_id }}</td>
+                            <td>{{ order.category }}</td>
                             <td>{{ order.quantity }}</td>
-                            <td>${{ order.unit_price }}</td>
+                            <td>{{ order.unit_price }}</td>
+                            <td>{{ order.currency }}</td>
                             <td>
                                 <a href="{{ url_for('edit_order', order_id=order.id) }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-edit"></i>
@@ -171,11 +169,10 @@
                                 row += "<td>" + item.category_label + "</td>";
                                 row += "<td>" + item.quantity_available + "</td>";
                             } else if (tableId === "#order-table") {
-                                row += "<td>" + item.product_id + "</td>";
-                                row += "<td>" + item.partner_id + "</td>";
-                                row += "<td>" + item.warehouse_id + "</td>";
+                                row += "<td>" + item.category + "</td>";
                                 row += "<td>" + item.quantity + "</td>";
                                 row += "<td>" + item.unit_price + "</td>";
+                                row += "<td>" + item.currency + "</td>";
                             }
                             row += "<td>";
                             if (tableId === "#product-table") {

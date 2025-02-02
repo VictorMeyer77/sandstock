@@ -95,24 +95,30 @@ class UpdateProductForm(FlaskForm):
 
 
 class CreateOrderForm(FlaskForm):
+    category = SelectField(
+        "Category", choices=[("TRANSACTION", "TRANSACTION"), ("CORRECTION", "CORRECTION")], validators=[DataRequired()]
+    )
     product_name = SelectField("Product", coerce=str, validators=[DataRequired()])
     partner_name = SelectField("Partner", coerce=str, validators=[DataRequired()])
     warehouse_name = SelectField("Warehouse", coerce=str, validators=[DataRequired()])
     quantity = IntegerField("Quantity", validators=[DataRequired()])
-    unit_price = FloatField("Unit Price", validators=[DataRequired()])
+    unit_price = FloatField("Unit Price")
+    currency = SelectField("Currency", choices=[("USD", "USD"), ("EUR", "EUR")], validators=[DataRequired()])
     submit = SubmitField("Add Order")
 
     def validate_unit_price(self, field):
-        if field.data <= 0:
-            raise ValidationError("Price must be greater than 0.")
+        if field.data < 0.0:
+            raise ValidationError("Price must be greater or equal than 0.")
 
 
 class UpdateOrderForm(FlaskForm):
-    id = IntegerField("Order ID", render_kw={"readonly": True})
-    product_name = StringField("Product", validators=[DataRequired()])
-    partner_name = StringField("Partner", validators=[DataRequired()])
-    warehouse_name = StringField("Warehouse", validators=[DataRequired()])
+    id = IntegerField("ID", render_kw={"readonly": True})
+    category = StringField("Category", validators=[DataRequired()], render_kw={"readonly": True})
+    product_name = StringField("Product", validators=[DataRequired()], render_kw={"readonly": True})
+    partner_name = StringField("Partner", validators=[DataRequired()], render_kw={"readonly": True})
+    warehouse_name = StringField("Warehouse", validators=[DataRequired()], render_kw={"readonly": True})
     quantity = IntegerField("Quantity", validators=[DataRequired()], render_kw={"readonly": True})
     unit_price = FloatField("Unit Price", validators=[DataRequired()], render_kw={"readonly": True})
+    currency = StringField("Currency", validators=[DataRequired()], render_kw={"readonly": True})
     created_at = DateTimeLocalField("Created At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
     submit = SubmitField("Update Order", render_kw={"disabled": True})

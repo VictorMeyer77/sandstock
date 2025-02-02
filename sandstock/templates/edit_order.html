@@ -4,58 +4,111 @@
 <div class="container">
     <div class="card">
         <h1>Edit Order</h1>
+        <hr>
         <form method="POST" action="{{ url_for('edit_order', order_id=order.id) }}">
             {{ form.hidden_tag() }}
-            <div class="form-group">
-                {{ form.id.label }}<br>
-                {{ form.id(class="form-control", readonly=true) }}
-            </div>
 
-            <div class="form-group form-group-inline">
-                {{ form.product_name.label }}<br>
-                <div class="input-group">
-                    {{ form.product_name(class="form-control", readonly=true) }}
-                    <a href="{{ url_for('edit_product', product_id=order.product_id) }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-edit"></i>
-                    </a>
+            <!-- ID and Category fields on the same row -->
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.id.label }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.id(class="form-control", readonly=true) }}
                 </div>
             </div>
 
-            <div class="form-group form-group-inline">
-                {{ form.partner_name.label }}<br>
-                <div class="input-group">
-                    {{ form.partner_name(class="form-control", readonly=true) }}
-                    <a href="{{ url_for('edit_partner', partner_id=order.partner_id) }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-edit"></i>
-                    </a>
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.category.label }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.category(class="form-control", readonly=true) }}
                 </div>
             </div>
 
-            <div class="form-group form-group-inline">
-                {{ form.warehouse_name.label }}<br>
-                <div class="input-group">
-                    {{ form.warehouse_name(class="form-control", readonly=true) }}
-                    <a href="{{ url_for('edit_warehouse', warehouse_id=order.warehouse_id) }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-edit"></i>
-                    </a>
+            <!-- Product name field with label and input aligned in the same row -->
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.product_name.label }}
+                </div>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        {{ form.product_name(class="form-control", readonly=true) }}
+                        <a href="{{ url_for('edit_product', product_id=order.product_id) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                {{ form.quantity.label }}<br>
-                {{ form.quantity(class="form-control", readonly=true) }}
+            <!-- Partner name field with label and input aligned in the same row -->
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.partner_name.label }}
+                </div>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        {{ form.partner_name(class="form-control", readonly=true) }}
+                        <a href="{{ url_for('edit_partner', partner_id=order.partner_id) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                {{ form.unit_price.label }}<br>
-                {{ form.unit_price(class="form-control", readonly=true) }}
+            <!-- Warehouse name field with label and input aligned in the same row -->
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.warehouse_name.label }}
+                </div>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        {{ form.warehouse_name(class="form-control", readonly=true) }}
+                        <a href="{{ url_for('edit_warehouse', warehouse_id=order.warehouse_id) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <h2>History</h2>
-            <hr>
-            <div class="form-group">
-                {{ form.created_at.label }}<br>
-                {{ form.created_at(class="form-control", readonly=true) }}
+            <!-- Quantity field with label and input aligned in the same row -->
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.quantity.label }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.quantity(class="form-control", readonly=true) }}
+                </div>
+            </div>
+
+            <!-- Unit price field with label and input aligned in the same row -->
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.unit_price.label }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.unit_price(class="form-control", readonly=true) }}
+                </div>
+            </div>
+
+            <!-- Currency field with label and input aligned in the same row -->
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.currency.label }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.currency(class="form-control", readonly=true) }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.created_at.label }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.created_at(class="form-control", readonly=true) }}
+                </div>
             </div>
         </form>
     </div>

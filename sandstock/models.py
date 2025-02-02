@@ -92,10 +92,11 @@ class Order(db.Model):
     __tablename__ = "fact_order"
 
     id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String(200), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey("dim_product.id"), nullable=False)
     partner_id = db.Column(db.Integer, db.ForeignKey("dim_partner.id"), nullable=False)
     warehouse_id = db.Column(db.Integer, db.ForeignKey("dim_warehouse.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     unit_price = db.Column(db.Float, nullable=False)
+    currency = db.Column(db.String(3), nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
-    deleted = db.Column(db.Boolean, default=False, nullable=False)

@@ -319,3 +319,29 @@ hr {
 .form-group-inline .input-group .btn:hover {
     background-color: #357ab7;
 }
+
+/* === FORM LABEL STYLES === */
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+/* === FORM ROW STYLES === */
+.form-group.row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-group.row .col-md-3 {
+    text-align: right;
+    padding-right: 15px;
+}
+
+.form-group.row .col-md-9 {
+    flex: 1;
+}
+
+.form-group.row .offset-md-3 {
+    margin-left: 25%;
+}

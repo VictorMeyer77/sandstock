@@ -4,55 +4,154 @@
 <div class="container">
     <div class="card">
         <h1>Add Order</h1>
+        <hr>
         <form method="POST" action="{{ url_for('add_order') }}">
             {{ form.hidden_tag() }}
+
             <div class="form-group row">
-                <div class="col-md-6">
+                <div class="col-md-3">
+                    {{ form.category.label }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.category(class="form-control select-box") }}
+                    {% if form.category.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for error in form.category.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.product_name.label }}
+                </div>
+                <div class="col-md-9">
                     <input type="text" id="product-search" placeholder="Search Products" class="form-control">
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-9 offset-md-3">
                     {{ form.product_name(class="form-control select-box") }}
+                    {% if form.product_name.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for error in form.product_name.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
+
             <div class="form-group row">
-                <div class="col-md-6">
+                <div class="col-md-3">
+                    {{ form.partner_name.label }}
+                </div>
+                <div class="col-md-9">
                     <input type="text" id="partner-search" placeholder="Search Partners" class="form-control">
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-9 offset-md-3">
                     {{ form.partner_name(class="form-control select-box") }}
+                    {% if form.partner_name.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for error in form.partner_name.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
+
             <div class="form-group row">
-                <div class="col-md-6">
+                <div class="col-md-3">
+                    {{ form.warehouse_name.label }}
+                </div>
+                <div class="col-md-9">
                     <input type="text" id="warehouse-search" placeholder="Search Warehouses" class="form-control">
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-9 offset-md-3">
                     {{ form.warehouse_name(class="form-control select-box") }}
+                    {% if form.warehouse_name.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for error in form.warehouse_name.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
-            <div class="form-group">
-                {{ form.quantity.label }}<br>
-                {{ form.quantity(class="form-control", size=32) }}
+
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.quantity.label }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.quantity(class="form-control", size=32) }}
+                    {% if form.quantity.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for error in form.quantity.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
-            <div class="form-group">
-                {{ form.unit_price.label }}<br>
-                {{ form.unit_price(class="form-control", size=32) }}
-                {% if form.unit_price.errors %}
-                    <div class="alert alert-danger">
-                        <ul>
-                            {% for error in form.unit_price.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
+
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.unit_price.label }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.unit_price(class="form-control", size=32) }}
+                    {% if form.unit_price.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for error in form.unit_price.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
-            <div class="form-group">
-                {{ form.submit(class="btn btn-primary") }}
+
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.currency.label }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.currency(class="form-control select-box") }}
+                    {% if form.currency.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for error in form.currency.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-12">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
             </div>
         </form>
     </div>
 </div>
+
 <script>
     $(document).ready(function() {
         function updateSelectBox(endpoint, inputId, selectId) {

@@ -64,7 +64,7 @@ def register_routes(app: Flask):
     @app.route("/")
     # @login_required
     def home():
-        orders = Order.query.filter_by(deleted=False).limit(10).all()
+        orders = Order.query.filter_by().limit(10).all()
         partners = Partner.query.filter_by(deleted=False).limit(10).all()
         warehouses = Warehouse.query.filter_by(deleted=False).limit(10).all()
         products = Product.query.filter_by(deleted=False).limit(10).all()
@@ -352,11 +352,13 @@ def register_routes(app: Flask):
             warehouse_id = re.match(regex, form.warehouse_name.data).group(2)
 
             order = Order(
+                category=form.category.data,
                 product_id=product_id,
                 partner_id=partner_id,
                 warehouse_id=warehouse_id,
                 quantity=form.quantity.data,
                 unit_price=form.unit_price.data,
+                currency=form.currency.data,
             )
             db.session.add(order)
             db.session.commit()
@@ -369,17 +371,18 @@ def register_routes(app: Flask):
     # @login_required
     def get_orders():
         query = request.args.get("query", "")
-        results = Order.query.filter(Order.id.ilike(f"%{query}%"), Order.deleted == False).limit(10).all()
+        results = Order.query.filter(Order.id.ilike(f"%{query}%")).limit(10).all()
         orders = [
             {
                 "id": order.id,
+                "category": order.category,
                 "product_id": order.product_id,
                 "partner_id": order.partner_id,
                 "warehouse_id": order.warehouse_id,
                 "quantity": order.quantity,
                 "unit_price": order.unit_price,
+                "currency": order.currency,
                 "created_at": order.created_at,
-                "deleted": order.deleted,
             }
             for order in results
         ]
@@ -395,11 +398,13 @@ def register_routes(app: Flask):
 
         form = UpdateOrderForm(
             id=order.id,
+            category=order.category,
             product_name=product.name,
             partner_name=partner.name,
             warehouse_name=warehouse.name,
             quantity=order.quantity,
             unit_price=order.unit_price,
+            currency=order.currency,
             created_at=order.created_at,
         )
         return render_template("edit_order.html", form=form, order=order)
