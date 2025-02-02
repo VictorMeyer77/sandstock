@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField
 from wtforms.fields.choices import SelectField
 from wtforms.fields.datetime import DateTimeLocalField
-from wtforms.fields.numeric import IntegerField, FloatField
+from wtforms.fields.numeric import FloatField, IntegerField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
@@ -105,4 +105,3 @@ class CreateOrderForm(FlaskForm):
     def validate_unit_price(self, field):
         if field.data <= 0:
             raise ValidationError("Price must be greater than 0.")
-

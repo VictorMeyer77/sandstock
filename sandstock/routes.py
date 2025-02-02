@@ -1,7 +1,10 @@
+import re
+
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import login_required, login_user, logout_user
 
 from sandstock.forms import (
+    CreateOrderForm,
     CreatePartnerForm,
     CreateProductForm,
     CreateWarehouseForm,
@@ -9,9 +12,9 @@ from sandstock.forms import (
     RegisterForm,
     UpdatePartnerForm,
     UpdateProductForm,
-    UpdateWarehouseForm, CreateOrderForm,
+    UpdateWarehouseForm,
 )
-from sandstock.models import Address, Contact, Partner, Product, User, Warehouse, db, Order
+from sandstock.models import Address, Contact, Order, Partner, Product, User, Warehouse, db
 
 
 def register_routes(app: Flask):
@@ -169,7 +172,6 @@ def register_routes(app: Flask):
         ]
         return jsonify(partners)
 
-
     # Warehouse
 
     @app.route("/add_warehouse", methods=["GET", "POST"])
@@ -324,31 +326,35 @@ def register_routes(app: Flask):
         ]
         return jsonify(products)
 
-
     # Order
 
     @app.route("/add_order", methods=["GET", "POST"])
-    #@login_required
+    # @login_required
     def add_order():
         form = CreateOrderForm()
-        form.product_name.choices = [(product.name, product.name) for product in
-                                     Product.query.filter_by(deleted=False).limit(20).all()]
-        form.partner_name.choices = [(partner.name, partner.name) for partner in
-                                     Partner.query.filter_by(deleted=False).limit(20).all()]
-        form.warehouse_name.choices = [(warehouse.name, warehouse.name) for warehouse in
-                                       Warehouse.query.filter_by(deleted=False).limit(20).all()]
+        form.product_name.choices = [
+            f"{product.name} ({product.id})" for product in Product.query.filter_by(deleted=False).limit(20).all()
+        ]
+        form.partner_name.choices = [
+            f"{partner.name} ({partner.id})" for partner in Partner.query.filter_by(deleted=False).limit(20).all()
+        ]
+        form.warehouse_name.choices = [
+            f"{warehouse.name} ({warehouse.id})"
+            for warehouse in Warehouse.query.filter_by(deleted=False).limit(20).all()
+        ]
 
         if form.validate_on_submit():
-            product = Product.query.filter_by(name=form.product_name.data).first()
-            partner = Partner.query.filter_by(name=form.partner_name.data).first()
-            warehouse = Warehouse.query.filter_by(name=form.warehouse_name.data).first()
+            regex = "(.+?) \((\d+)\)$"
+            product_id = re.match(regex, form.product_name.data).group(2)
+            partner_id = re.match(regex, form.partner_name.data).group(2)
+            warehouse_id = re.match(regex, form.warehouse_name.data).group(2)
 
             order = Order(
-                product_id=product.id,
-                partner_id=partner.id,
-                warehouse_id=warehouse.id,
+                product_id=product_id,
+                partner_id=partner_id,
+                warehouse_id=warehouse_id,
                 quantity=form.quantity.data,
-                unit_price=form.unit_price.data
+                unit_price=form.unit_price.data,
             )
             db.session.add(order)
             db.session.commit()
