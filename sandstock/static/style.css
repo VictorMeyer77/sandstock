@@ -1,11 +1,20 @@
 /* === GENERAL STYLES === */
 body {
-    background: linear-gradient(145deg, #e2e8f0, #f0f5f9);  /* Soft gradient background */
-    color: #2d3748;  /* Darker text for better readability */
+    background: linear-gradient(145deg, #e2e8f0, #f0f5f9);
+    color: #2d3748;
     font-family: 'Arial', sans-serif;
     overflow-x: hidden;
     margin: 0;
     padding: 0;
+}
+
+/* === CONTAINER STYLES === */
+.table-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: space-between;
+    padding: 20px;
 }
 
 /* === HEADINGS === */
@@ -145,30 +154,26 @@ h1, h2, h3, h4, h5, h6 {
 
 /* === TABLE STYLES === */
 .table {
-    background-color: transparent;
-    color: #2d3748;
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 25px;
-    font-size: 14px;  /* Smaller font size for table rows */
+    font-size: 14px;
 }
 
 .table th {
     background-color: #f7fafc;
     color: #4a90e2;
-    padding: 12px;  /* Slightly smaller padding for headers */
+    padding: 12px;
     text-align: left;
     font-weight: 600;
 }
 
 .table td {
-    padding: 12px;  /* Slightly smaller padding for table cells */
-    text-align: left;
+    padding: 12px;
     border-bottom: 1px solid #e2e8f0;
 }
 
 .table tbody tr:hover {
-    background-color: rgba(74, 144, 226, 0.05);  /* Subtle hover effect */
+    background-color: rgba(74, 144, 226, 0.05);
 }
 
 /* === FOOTER === */
@@ -192,16 +197,56 @@ footer {
 }
 
 /* === RESPONSIVENESS === */
-@media (max-width: 768px) {
-    .navbar-nav {
-        text-align: center;
+@media (max-width: 1024px) {
+    .table-container {
+        flex-direction: column;
+        align-items: center;
     }
 
-    .search-bar {
-        flex-direction: column;
-        gap: 5px;
+    .table-column {
+        width: 100%;
+        max-width: 500px;
     }
 }
+
+/* Each table takes up equal space on large screens */
+.table-column {
+    flex: 1;
+    min-width: 300px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* === SEARCH BAR === */
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.search-bar button {
+    padding: 10px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.search-bar button:hover {
+    background-color: #357ab7;
+}
+
 
 /* === ALERT STYLES === */
 .alert {
