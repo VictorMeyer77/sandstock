@@ -69,9 +69,9 @@
             });
         }
 
-        updateSelectBox("{{ url_for('search_products') }}", "#product-search", "#product_name");
-        updateSelectBox("{{ url_for('search_partners') }}", "#partner-search", "#partner_name");
-        updateSelectBox("{{ url_for('search_warehouses') }}", "#warehouse-search", "#warehouse_name");
+        updateSelectBox("{{ url_for('get_products') }}", "#product-search", "#product_name");
+        updateSelectBox("{{ url_for('get_partners') }}", "#partner-search", "#partner_name");
+        updateSelectBox("{{ url_for('get_warehouses') }}", "#warehouse-search", "#warehouse_name");
     });
 </script>
 {% endblock %}

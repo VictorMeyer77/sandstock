@@ -70,7 +70,7 @@ def register_routes(app: Flask):
 
     # Partner
 
-    @app.route("/add_partner", methods=["GET", "POST"])
+    @app.route("/partner/add", methods=["GET", "POST"])
     # @login_required
     def add_partner():
         form = CreatePartnerForm()
@@ -152,9 +152,9 @@ def register_routes(app: Flask):
         flash("Partner deleted successfully!", "success")
         return redirect(url_for("home"))
 
-    @app.route("/search_partners", methods=["GET"])
+    @app.route("/partner/get", methods=["GET"])
     # @login_required
-    def search_partners():
+    def get_partners():
         query = request.args.get("query", "")
         results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), Partner.deleted == False).limit(20).all()
         partners = [
@@ -245,9 +245,9 @@ def register_routes(app: Flask):
         flash("Warehouse deleted successfully!", "success")
         return redirect(url_for("home"))
 
-    @app.route("/search_warehouses", methods=["GET"])
+    @app.route("/warehouse/get", methods=["GET"])
     # @login_required
-    def search_warehouses():
+    def get_warehouses():
         query = request.args.get("query", "")
         results = Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted == False).limit(20).all()
         warehouses = [
@@ -306,9 +306,9 @@ def register_routes(app: Flask):
         flash("Product deleted successfully!", "success")
         return redirect(url_for("home"))
 
-    @app.route("/search_products", methods=["GET"])
+    @app.route("/product/get", methods=["GET"])
     # @login_required
-    def search_products():
+    def get_products():
         query = request.args.get("query", "")
         results = Product.query.filter(Product.name.ilike(f"%{query}%"), Product.deleted == False).limit(20).all()
         products = [
