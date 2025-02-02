@@ -59,7 +59,8 @@
                         var select = $(selectId);
                         select.empty();
                         data.forEach(function(item) {
-                            select.append(new Option(item.name, item.name));
+                            var option = new Option(item.name + '  (' + item.id + ')');
+                            select.append(option);
                         });
                     },
                     error: function(xhr, status, error) {

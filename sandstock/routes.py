@@ -328,7 +328,7 @@ def register_routes(app: Flask):
 
     # Order
 
-    @app.route("/add_order", methods=["GET", "POST"])
+    @app.route("/order/add", methods=["GET", "POST"])
     # @login_required
     def add_order():
         form = CreateOrderForm()
