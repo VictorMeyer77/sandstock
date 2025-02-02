@@ -156,7 +156,7 @@ def register_routes(app: Flask):
     # @login_required
     def get_partners():
         query = request.args.get("query", "")
-        results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), Partner.deleted == False).limit(20).all()
+        results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), Partner.deleted == False).limit(10).all()
         partners = [
             {
                 "id": partner.id,
@@ -174,7 +174,7 @@ def register_routes(app: Flask):
 
     # Warehouse
 
-    @app.route("/add_warehouse", methods=["GET", "POST"])
+    @app.route("/warehouse/add", methods=["GET", "POST"])
     # @login_required
     def add_warehouse():
         form = CreateWarehouseForm()
@@ -249,7 +249,7 @@ def register_routes(app: Flask):
     # @login_required
     def get_warehouses():
         query = request.args.get("query", "")
-        results = Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted == False).limit(20).all()
+        results = Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted == False).limit(10).all()
         warehouses = [
             {
                 "id": warehouse.id,
@@ -266,7 +266,7 @@ def register_routes(app: Flask):
 
     # Product
 
-    @app.route("/add_product", methods=["GET", "POST"])
+    @app.route("/product/add", methods=["GET", "POST"])
     # @login_required
     def add_product():
         form = CreateProductForm()
@@ -310,7 +310,7 @@ def register_routes(app: Flask):
     # @login_required
     def get_products():
         query = request.args.get("query", "")
-        results = Product.query.filter(Product.name.ilike(f"%{query}%"), Product.deleted == False).limit(20).all()
+        results = Product.query.filter(Product.name.ilike(f"%{query}%"), Product.deleted == False).limit(10).all()
         products = [
             {
                 "id": product.id,
@@ -333,14 +333,14 @@ def register_routes(app: Flask):
     def add_order():
         form = CreateOrderForm()
         form.product_name.choices = [
-            f"{product.name} ({product.id})" for product in Product.query.filter_by(deleted=False).limit(20).all()
+            f"{product.name} ({product.id})" for product in Product.query.filter_by(deleted=False).limit(10).all()
         ]
         form.partner_name.choices = [
-            f"{partner.name} ({partner.id})" for partner in Partner.query.filter_by(deleted=False).limit(20).all()
+            f"{partner.name} ({partner.id})" for partner in Partner.query.filter_by(deleted=False).limit(10).all()
         ]
         form.warehouse_name.choices = [
             f"{warehouse.name} ({warehouse.id})"
-            for warehouse in Warehouse.query.filter_by(deleted=False).limit(20).all()
+            for warehouse in Warehouse.query.filter_by(deleted=False).limit(10).all()
         ]
 
         if form.validate_on_submit():
