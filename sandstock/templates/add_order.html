@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Add Order{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="card">
+        <h1>Add Order</h1>
+        <form method="POST" action="{{ url_for('add_order') }}">
+            {{ form.hidden_tag() }}
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <input type="text" id="product-search" placeholder="Search Products" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    {{ form.product_name(class="form-control select-box") }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <input type="text" id="partner-search" placeholder="Search Partners" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    {{ form.partner_name(class="form-control select-box") }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <input type="text" id="warehouse-search" placeholder="Search Warehouses" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    {{ form.warehouse_name(class="form-control select-box") }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ form.quantity.label }}<br>
+                {{ form.quantity(class="form-control", size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.unit_price.label }}<br>
+                {{ form.unit_price(class="form-control", size=32) }}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        function updateSelectBox(endpoint, inputId, selectId) {
+            $(inputId).on('input', function() {
+                var query = $(this).val().trim();
+                if (query.length < 1) return;  // Prevent empty queries
+
+                $.ajax({
+                    url: endpoint,
+                    method: "GET",
+                    data: { query: query },
+                    success: function(data) {
+                        var select = $(selectId);
+                        select.empty();
+                        data.forEach(function(item) {
+                            select.append(new Option(item.name, item.name));
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                    }
+                });
+            });
+        }
+
+        updateSelectBox("{{ url_for('search_products') }}", "#product-search", "#product_name");
+        updateSelectBox("{{ url_for('search_partners') }}", "#partner-search", "#partner_name");
+        updateSelectBox("{{ url_for('search_warehouses') }}", "#warehouse-search", "#warehouse_name");
+    });
+</script>
+{% endblock %}

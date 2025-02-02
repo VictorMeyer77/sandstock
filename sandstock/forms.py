@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField
 from wtforms.fields.choices import SelectField
 from wtforms.fields.datetime import DateTimeLocalField
-from wtforms.fields.numeric import IntegerField
+from wtforms.fields.numeric import IntegerField, FloatField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
@@ -94,14 +94,15 @@ class UpdateProductForm(FlaskForm):
     submit = SubmitField("Update Product")
 
 
-class TransactionForm(FlaskForm):
-    product_id = SelectField("Product", coerce=int, validators=[DataRequired()])
-    transaction_type = SelectField(
-        "Transaction Type", choices=[("IN", "IN"), ("OUT", "OUT")], validators=[DataRequired()]
-    )
+class CreateOrderForm(FlaskForm):
+    product_name = SelectField("Product", coerce=str, validators=[DataRequired()])
+    partner_name = SelectField("Partner", coerce=str, validators=[DataRequired()])
+    warehouse_name = SelectField("Warehouse", coerce=str, validators=[DataRequired()])
     quantity = IntegerField("Quantity", validators=[DataRequired()])
-    submit = SubmitField("Add Transaction")
+    unit_price = FloatField("Unit Price", validators=[DataRequired()])
+    submit = SubmitField("Add Order")
 
-    def validate_quantity(self, field):
+    def validate_unit_price(self, field):
         if field.data <= 0:
-            raise ValidationError("Quantity must be greater than 0.")
+            raise ValidationError("Price must be greater than 0.")
+

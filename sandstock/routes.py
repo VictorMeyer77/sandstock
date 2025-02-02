@@ -9,9 +9,9 @@ from sandstock.forms import (
     RegisterForm,
     UpdatePartnerForm,
     UpdateProductForm,
-    UpdateWarehouseForm,
+    UpdateWarehouseForm, CreateOrderForm,
 )
-from sandstock.models import Address, Contact, Partner, Product, User, Warehouse, db
+from sandstock.models import Address, Contact, Partner, Product, User, Warehouse, db, Order
 
 
 def register_routes(app: Flask):
@@ -64,6 +64,8 @@ def register_routes(app: Flask):
         warehouses = Warehouse.query.filter_by(deleted=False).limit(10).all()
         products = Product.query.filter_by(deleted=False).limit(10).all()
         return render_template("home.html", partners=partners, warehouses=warehouses, products=products)
+
+    # Partner
 
     @app.route("/add_partner", methods=["GET", "POST"])
     # @login_required
@@ -147,6 +149,29 @@ def register_routes(app: Flask):
         flash("Partner deleted successfully!", "success")
         return redirect(url_for("home"))
 
+    @app.route("/search_partners", methods=["GET"])
+    # @login_required
+    def search_partners():
+        query = request.args.get("query", "")
+        results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), Partner.deleted == False).limit(20).all()
+        partners = [
+            {
+                "id": partner.id,
+                "name": partner.name,
+                "contact_person": partner.contact_person,
+                "address_id": partner.address_id,
+                "contact_id": partner.contact_id,
+                "created_at": partner.created_at,
+                "updated_at": partner.updated_at,
+                "deleted": partner.deleted,
+            }
+            for partner in results
+        ]
+        return jsonify(partners)
+
+
+    # Warehouse
+
     @app.route("/add_warehouse", methods=["GET", "POST"])
     # @login_required
     def add_warehouse():
@@ -218,6 +243,27 @@ def register_routes(app: Flask):
         flash("Warehouse deleted successfully!", "success")
         return redirect(url_for("home"))
 
+    @app.route("/search_warehouses", methods=["GET"])
+    # @login_required
+    def search_warehouses():
+        query = request.args.get("query", "")
+        results = Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted == False).limit(20).all()
+        warehouses = [
+            {
+                "id": warehouse.id,
+                "name": warehouse.name,
+                "address_id": warehouse.address_id,
+                "contact_id": warehouse.contact_id,
+                "created_at": warehouse.created_at,
+                "updated_at": warehouse.updated_at,
+                "deleted": warehouse.deleted,
+            }
+            for warehouse in results
+        ]
+        return jsonify(warehouses)
+
+    # Product
+
     @app.route("/add_product", methods=["GET", "POST"])
     # @login_required
     def add_product():
@@ -258,50 +304,11 @@ def register_routes(app: Flask):
         flash("Product deleted successfully!", "success")
         return redirect(url_for("home"))
 
-    @app.route("/search_partners", methods=["GET"])
-    # @login_required
-    def search_partners():
-        query = request.args.get("query", "")
-        results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), not Partner.deleted).limit(20).all()
-        partners = [
-            {
-                "id": partner.id,
-                "name": partner.name,
-                "contact_person": partner.contact_person,
-                "address_id": partner.address_id,
-                "contact_id": partner.contact_id,
-                "created_at": partner.created_at,
-                "updated_at": partner.updated_at,
-                "deleted": partner.deleted,
-            }
-            for partner in results
-        ]
-        return jsonify(partners)
-
-    @app.route("/search_warehouses", methods=["GET"])
-    # @login_required
-    def search_warehouses():
-        query = request.args.get("query", "")
-        results = Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), not Warehouse.deleted).limit(20).all()
-        warehouses = [
-            {
-                "id": warehouse.id,
-                "name": warehouse.name,
-                "address_id": warehouse.address_id,
-                "contact_id": warehouse.contact_id,
-                "created_at": warehouse.created_at,
-                "updated_at": warehouse.updated_at,
-                "deleted": warehouse.deleted,
-            }
-            for warehouse in results
-        ]
-        return jsonify(warehouses)
-
     @app.route("/search_products", methods=["GET"])
     # @login_required
     def search_products():
         query = request.args.get("query", "")
-        results = Product.query.filter(Product.name.ilike(f"%{query}%"), not Product.deleted).limit(20).all()
+        results = Product.query.filter(Product.name.ilike(f"%{query}%"), Product.deleted == False).limit(20).all()
         products = [
             {
                 "id": product.id,
@@ -316,3 +323,36 @@ def register_routes(app: Flask):
             for product in results
         ]
         return jsonify(products)
+
+
+    # Order
+
+    @app.route("/add_order", methods=["GET", "POST"])
+    #@login_required
+    def add_order():
+        form = CreateOrderForm()
+        form.product_name.choices = [(product.name, product.name) for product in
+                                     Product.query.filter_by(deleted=False).limit(20).all()]
+        form.partner_name.choices = [(partner.name, partner.name) for partner in
+                                     Partner.query.filter_by(deleted=False).limit(20).all()]
+        form.warehouse_name.choices = [(warehouse.name, warehouse.name) for warehouse in
+                                       Warehouse.query.filter_by(deleted=False).limit(20).all()]
+
+        if form.validate_on_submit():
+            product = Product.query.filter_by(name=form.product_name.data).first()
+            partner = Partner.query.filter_by(name=form.partner_name.data).first()
+            warehouse = Warehouse.query.filter_by(name=form.warehouse_name.data).first()
+
+            order = Order(
+                product_id=product.id,
+                partner_id=partner.id,
+                warehouse_id=warehouse.id,
+                quantity=form.quantity.data,
+                unit_price=form.unit_price.data
+            )
+            db.session.add(order)
+            db.session.commit()
+            flash("Order added successfully!", "success")
+            return redirect(url_for("add_order"))
+
+        return render_template("add_order.html", form=form)
