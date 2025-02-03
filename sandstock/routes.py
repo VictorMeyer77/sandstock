@@ -62,7 +62,7 @@ def register_routes(app: Flask):
         return redirect(url_for("login"))
 
     @app.route("/")
-    # @login_required
+    @login_required
     def home():
         orders = Order.query.filter_by().limit(10).all()
         partners = Partner.query.filter_by(deleted=False).limit(10).all()
@@ -73,7 +73,7 @@ def register_routes(app: Flask):
     # Partner
 
     @app.route("/partner/add", methods=["GET", "POST"])
-    # @login_required
+    @login_required
     def add_partner():
         form = CreatePartnerForm()
         if form.validate_on_submit():
@@ -106,7 +106,7 @@ def register_routes(app: Flask):
         return render_template("add_partner.html", form=form)
 
     @app.route("/partner/<int:partner_id>/edit", methods=["GET", "POST"])
-    # @login_required
+    @login_required
     def edit_partner(partner_id):
         partner = Partner.query.get_or_404(partner_id)
         contact = Contact.query.get_or_404(partner.contact_id)
@@ -146,7 +146,7 @@ def register_routes(app: Flask):
         return render_template("edit_partner.html", form=form, partner=partner)
 
     @app.route("/partner/<int:partner_id>/delete", methods=["POST"])
-    # @login_required
+    @login_required
     def delete_partner(partner_id):
         partner = Partner.query.get_or_404(partner_id)
         partner.deleted = True
@@ -155,7 +155,7 @@ def register_routes(app: Flask):
         return redirect(url_for("home"))
 
     @app.route("/partner/get", methods=["GET"])
-    # @login_required
+    @login_required
     def get_partners():
         query = request.args.get("query", "")
         results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), Partner.deleted == False).limit(10).all()
@@ -177,7 +177,7 @@ def register_routes(app: Flask):
     # Warehouse
 
     @app.route("/warehouse/add", methods=["GET", "POST"])
-    # @login_required
+    @login_required
     def add_warehouse():
         form = CreateWarehouseForm()
         if form.validate_on_submit():
@@ -205,7 +205,7 @@ def register_routes(app: Flask):
         return render_template("add_warehouse.html", form=form)
 
     @app.route("/warehouse/<int:warehouse_id>/edit", methods=["GET", "POST"])
-    # @login_required
+    @login_required
     def edit_warehouse(warehouse_id):
         warehouse = Warehouse.query.get_or_404(warehouse_id)
         contact = Contact.query.get_or_404(warehouse.contact_id)
@@ -239,7 +239,7 @@ def register_routes(app: Flask):
         return render_template("edit_warehouse.html", form=form, warehouse=warehouse)
 
     @app.route("/warehouse/<int:warehouse_id>/delete", methods=["POST"])
-    # @login_required
+    @login_required
     def delete_warehouse(warehouse_id):
         warehouse = Warehouse.query.get_or_404(warehouse_id)
         warehouse.deleted = True
@@ -248,7 +248,7 @@ def register_routes(app: Flask):
         return redirect(url_for("home"))
 
     @app.route("/warehouse/get", methods=["GET"])
-    # @login_required
+    @login_required
     def get_warehouses():
         query = request.args.get("query", "")
         results = Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted == False).limit(10).all()
@@ -269,7 +269,7 @@ def register_routes(app: Flask):
     # Product
 
     @app.route("/product/add", methods=["GET", "POST"])
-    # @login_required
+    @login_required
     def add_product():
         form = CreateProductForm()
         if form.validate_on_submit():
@@ -286,7 +286,7 @@ def register_routes(app: Flask):
         return render_template("add_product.html", form=form)
 
     @app.route("/product/<int:product_id>/edit", methods=["GET", "POST"])
-    # @login_required
+    @login_required
     def edit_product(product_id):
         product = Product.query.get_or_404(product_id)
         form = UpdateProductForm(obj=product)
@@ -300,7 +300,7 @@ def register_routes(app: Flask):
         return render_template("edit_product.html", form=form, product=product)
 
     @app.route("/product/<int:product_id>/delete", methods=["POST"])
-    # @login_required
+    @login_required
     def delete_product(product_id):
         product = Product.query.get_or_404(product_id)
         product.deleted = True
@@ -309,7 +309,7 @@ def register_routes(app: Flask):
         return redirect(url_for("home"))
 
     @app.route("/product/get", methods=["GET"])
-    # @login_required
+    @login_required
     def get_products():
         query = request.args.get("query", "")
         results = Product.query.filter(Product.name.ilike(f"%{query}%"), Product.deleted == False).limit(10).all()
@@ -331,7 +331,7 @@ def register_routes(app: Flask):
     # Order
 
     @app.route("/order/add", methods=["GET", "POST"])
-    # @login_required
+    @login_required
     def add_order():
         form = CreateOrderForm()
         form.product_name.choices = [
@@ -368,7 +368,7 @@ def register_routes(app: Flask):
         return render_template("add_order.html", form=form)
 
     @app.route("/order/get", methods=["GET"])
-    # @login_required
+    @login_required
     def get_orders():
         query = request.args.get("query", "")
         results = Order.query.filter(Order.id.ilike(f"%{query}%")).limit(10).all()
@@ -389,7 +389,7 @@ def register_routes(app: Flask):
         return jsonify(orders)
 
     @app.route("/order/<int:order_id>/edit", methods=["GET"])
-    # @login_required
+    @login_required
     def edit_order(order_id):
         order = Order.query.get_or_404(order_id)
         product = Product.query.get_or_404(order.product_id)
