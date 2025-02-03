@@ -346,7 +346,7 @@ def register_routes(app: Flask):
         ]
 
         if form.validate_on_submit():
-            regex = "(.+?) \((\d+)\)$"
+            regex = r"(.+?) \((\d+)\)$"
             product_id = re.match(regex, form.product_name.data).group(2)
             partner_id = re.match(regex, form.partner_name.data).group(2)
             warehouse_id = re.match(regex, form.warehouse_name.data).group(2)

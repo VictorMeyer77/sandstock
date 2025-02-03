@@ -88,7 +88,7 @@ class UpdateProductForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     category_label = StringField("Category Label", validators=[DataRequired()])
     description = TextAreaField("Description", validators=[DataRequired()])
-    quantity_available = IntegerField("Quantity Available", validators=[DataRequired()], render_kw={"readonly": True})
+    quantity_available = IntegerField("Quantity Available", render_kw={"readonly": True})
     created_at = DateTimeLocalField("Created At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
     updated_at = DateTimeLocalField("Updated At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
     submit = SubmitField("Update Product")
