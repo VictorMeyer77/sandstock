@@ -56,6 +56,10 @@
                 {{ form.updated_at.label }}<br>
                 {{ form.updated_at(class="form-control") }}
             </div>
+            <div class="form-group">
+                {{ form.modified_by.label }}<br>
+                {{ form.modified_by(class="form-control") }}
+            </div>
             <div class="d-flex justify-content-between mt-3">
                 {{ form.submit(class="btn btn-primary") }}
                 <form method="POST" action="{{ url_for('delete_partner', partner_id=partner.id) }}" style="display:inline;">

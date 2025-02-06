@@ -8,7 +8,6 @@
         <form method="POST" action="{{ url_for('edit_order', order_id=order.id) }}">
             {{ form.hidden_tag() }}
 
-            <!-- ID and Category fields on the same row -->
             <div class="form-group row">
                 <div class="col-md-3">
                     {{ form.id.label }}
@@ -27,7 +26,6 @@
                 </div>
             </div>
 
-            <!-- Product name field with label and input aligned in the same row -->
             <div class="form-group row">
                 <div class="col-md-3">
                     {{ form.product_name.label }}
@@ -42,7 +40,6 @@
                 </div>
             </div>
 
-            <!-- Partner name field with label and input aligned in the same row -->
             <div class="form-group row">
                 <div class="col-md-3">
                     {{ form.partner_name.label }}
@@ -57,7 +54,6 @@
                 </div>
             </div>
 
-            <!-- Warehouse name field with label and input aligned in the same row -->
             <div class="form-group row">
                 <div class="col-md-3">
                     {{ form.warehouse_name.label }}
@@ -72,7 +68,6 @@
                 </div>
             </div>
 
-            <!-- Quantity field with label and input aligned in the same row -->
             <div class="form-group row">
                 <div class="col-md-3">
                     {{ form.quantity.label }}
@@ -82,7 +77,6 @@
                 </div>
             </div>
 
-            <!-- Unit price field with label and input aligned in the same row -->
             <div class="form-group row">
                 <div class="col-md-3">
                     {{ form.unit_price.label }}
@@ -92,7 +86,6 @@
                 </div>
             </div>
 
-            <!-- Currency field with label and input aligned in the same row -->
             <div class="form-group row">
                 <div class="col-md-3">
                     {{ form.currency.label }}
@@ -110,6 +103,16 @@
                     {{ form.created_at(class="form-control", readonly=true) }}
                 </div>
             </div>
+
+            <div class="form-group row">
+                <div class="col-md-3">
+                    {{ form.modified_by.label }}
+                </div>
+                <div class="col-md-9">
+                    {{ form.modified_by(class="form-control", readonly=true) }}
+                </div>
+            </div>
+
         </form>
     </div>
 </div>

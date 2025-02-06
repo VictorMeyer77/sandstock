@@ -1,11 +1,11 @@
 import re
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
-from flask_login import login_required, login_user, logout_user
-from werkzeug.security import generate_password_hash
+from flask_login import current_user, login_required, login_user, logout_user
 from flask_mail import Message
+from werkzeug.security import generate_password_hash
 
-from sandstock.extensions import mail, get_serializer
+from sandstock.extensions import get_serializer, mail
 from sandstock.forms import (
     CreateOrderForm,
     CreatePartnerForm,
@@ -82,7 +82,7 @@ def register_routes(app: Flask):
     def add_partner():
         form = CreatePartnerForm()
         if form.validate_on_submit():
-            contact = Contact(email=form.email.data, phone_number=form.phone_number.data)
+            contact = Contact(email=form.email.data, phone_number=form.phone_number.data, modified_by=current_user.id)
             db.session.add(contact)
             db.session.commit()
 
@@ -92,6 +92,7 @@ def register_routes(app: Flask):
                 state=form.state.data,
                 postal_code=form.postal_code.data,
                 country=form.country.data,
+                modified_by=current_user.id,
             )
             db.session.add(address)
             db.session.commit()
@@ -101,6 +102,7 @@ def register_routes(app: Flask):
                 contact_person=form.contact_person.data,
                 address_id=address.id,
                 contact_id=contact.id,
+                modified_by=current_user.id,
             )
             db.session.add(partner)
             db.session.commit()
@@ -116,6 +118,7 @@ def register_routes(app: Flask):
         partner = Partner.query.get_or_404(partner_id)
         contact = Contact.query.get_or_404(partner.contact_id)
         address = Address.query.get_or_404(partner.address_id)
+        modified_by = User.query.get_or_404(partner.modified_by).email
 
         form = UpdatePartnerForm(
             name=partner.name,
@@ -129,6 +132,7 @@ def register_routes(app: Flask):
             country=address.country,
             created_at=partner.created_at,
             updated_at=partner.updated_at,
+            modified_by=modified_by,
         )
 
         if form.validate_on_submit():
@@ -186,7 +190,7 @@ def register_routes(app: Flask):
     def add_warehouse():
         form = CreateWarehouseForm()
         if form.validate_on_submit():
-            contact = Contact(email=form.email.data, phone_number=form.phone_number.data)
+            contact = Contact(email=form.email.data, phone_number=form.phone_number.data, modified_by=current_user.id)
             db.session.add(contact)
             db.session.commit()
 
@@ -196,11 +200,14 @@ def register_routes(app: Flask):
                 state=form.state.data,
                 postal_code=form.postal_code.data,
                 country=form.country.data,
+                modified_by=current_user.id,
             )
             db.session.add(address)
             db.session.commit()
 
-            warehouse = Warehouse(name=form.name.data, address_id=address.id, contact_id=contact.id)
+            warehouse = Warehouse(
+                name=form.name.data, address_id=address.id, contact_id=contact.id, modified_by=current_user.id
+            )
             db.session.add(warehouse)
             db.session.commit()
 
@@ -215,6 +222,8 @@ def register_routes(app: Flask):
         warehouse = Warehouse.query.get_or_404(warehouse_id)
         contact = Contact.query.get_or_404(warehouse.contact_id)
         address = Address.query.get_or_404(warehouse.address_id)
+        modified_by = User.query.get_or_404(warehouse.modified_by).email
+
         form = UpdateWarehouseForm(
             name=warehouse.name,
             email=contact.email,
@@ -226,6 +235,7 @@ def register_routes(app: Flask):
             country=address.country,
             created_at=warehouse.created_at,
             updated_at=warehouse.updated_at,
+            modified_by=modified_by,
         )
 
         if form.validate_on_submit():
@@ -283,6 +293,7 @@ def register_routes(app: Flask):
                 category_label=form.category_label.data,
                 description=form.description.data,
                 quantity_available=0,
+                modified_by=current_user.id,
             )
             db.session.add(product)
             db.session.commit()
@@ -294,7 +305,18 @@ def register_routes(app: Flask):
     @login_required
     def edit_product(product_id):
         product = Product.query.get_or_404(product_id)
-        form = UpdateProductForm(obj=product)
+        modified_by = User.query.get_or_404(product.modified_by).email
+
+        form = UpdateProductForm(
+            name=product.name,
+            category_label=product.category_label,
+            description=product.description,
+            quantity_available=product.quantity_available,
+            created_at=product.created_at,
+            updated_at=product.updated_at,
+            modified_by=modified_by,
+        )
+
         if form.validate_on_submit():
             product.name = form.name.data
             product.category_label = form.category_label.data
@@ -364,6 +386,7 @@ def register_routes(app: Flask):
                 quantity=form.quantity.data,
                 unit_price=form.unit_price.data,
                 currency=form.currency.data,
+                modified_by=current_user.id,
             )
             db.session.add(order)
             db.session.commit()
@@ -411,6 +434,7 @@ def register_routes(app: Flask):
             unit_price=order.unit_price,
             currency=order.currency,
             created_at=order.created_at,
+            modified_by=current_user.email,
         )
         return render_template("edit_order.html", form=form, order=order)
 

@@ -23,6 +23,17 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Register")
 
 
+class ForgotPasswordForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    submit = SubmitField("Reset Password")
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField("New Password", validators=[DataRequired()])
+    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")])
+    submit = SubmitField("Change Password")
+
+
 class CreatePartnerForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     contact_person = StringField("Contact Person")
@@ -48,6 +59,7 @@ class UpdatePartnerForm(FlaskForm):
     country = StringField("Country", validators=[DataRequired()])
     created_at = DateTimeLocalField("Created At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
     updated_at = DateTimeLocalField("Updated At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
+    modified_by = StringField("Modified By", render_kw={"readonly": True})
     submit = SubmitField("Update Partner")
 
 
@@ -74,6 +86,7 @@ class UpdateWarehouseForm(FlaskForm):
     country = StringField("Country", validators=[DataRequired()])
     created_at = DateTimeLocalField("Created At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
     updated_at = DateTimeLocalField("Updated At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
+    modified_by = StringField("Modified By", render_kw={"readonly": True})
     submit = SubmitField("Update Warehouse")
 
 
@@ -91,6 +104,7 @@ class UpdateProductForm(FlaskForm):
     quantity_available = IntegerField("Quantity Available", render_kw={"readonly": True})
     created_at = DateTimeLocalField("Created At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
     updated_at = DateTimeLocalField("Updated At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
+    modified_by = StringField("Modified By", render_kw={"readonly": True})
     submit = SubmitField("Update Product")
 
 
@@ -121,15 +135,5 @@ class UpdateOrderForm(FlaskForm):
     unit_price = FloatField("Unit Price", validators=[DataRequired()], render_kw={"readonly": True})
     currency = StringField("Currency", validators=[DataRequired()], render_kw={"readonly": True})
     created_at = DateTimeLocalField("Created At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
+    modified_by = StringField("Modified By", render_kw={"readonly": True})
     submit = SubmitField("Update Order", render_kw={"disabled": True})
-
-
-class ForgotPasswordForm(FlaskForm):
-    email = StringField("Email", validators=[DataRequired(), Email()])
-    submit = SubmitField("Reset Password")
-
-
-class ResetPasswordForm(FlaskForm):
-    password = PasswordField("New Password", validators=[DataRequired()])
-    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")])
-    submit = SubmitField("Change Password")

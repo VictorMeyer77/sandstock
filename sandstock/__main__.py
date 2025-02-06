@@ -2,7 +2,7 @@ from flask import Flask
 from flask_login import LoginManager
 
 from sandstock.config import Config
-from sandstock.extensions import db, mail, init_serializer
+from sandstock.extensions import db, init_serializer, mail
 from sandstock.models import User
 from sandstock.routes import register_routes
 

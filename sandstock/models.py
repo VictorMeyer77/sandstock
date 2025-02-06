@@ -2,11 +2,10 @@ import json
 from datetime import datetime
 
 from flask_login import UserMixin
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event
 from werkzeug.security import check_password_hash, generate_password_hash
 
-db = SQLAlchemy()
+from sandstock.extensions import db
 
 
 class User(db.Model, UserMixin):
@@ -35,6 +34,7 @@ class Contact(db.Model):
     phone_number = db.Column(db.String(30), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
@@ -49,6 +49,7 @@ class Address(db.Model):
     country = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
@@ -62,6 +63,7 @@ class Partner(db.Model):
     contact_id = db.Column(db.Integer, db.ForeignKey("dim_contact.id"), nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
@@ -74,6 +76,7 @@ class Warehouse(db.Model):
     contact_id = db.Column(db.Integer, db.ForeignKey("dim_contact.id"), nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
@@ -87,6 +90,7 @@ class Product(db.Model):
     quantity_available = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
@@ -102,6 +106,7 @@ class Order(db.Model):
     unit_price = db.Column(db.Float, nullable=False)
     currency = db.Column(db.String(3), nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, nullable=False)
+    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
 
 
 # Change Data Capture
@@ -136,13 +141,15 @@ def log_changes(mapper, connection, target, operation):
     elif operation == "DELETE":
         old_data = {c.name: getattr(target, c.name) for c in target.__table__.columns}
 
-    change_log = ChangeLog(
-        table_name=target.__tablename__,
-        operation=operation,
-        old_data=json.dumps(old_data, default=lambda x: x.isoformat(), indent=4) if old_data else None,
-        new_data=json.dumps(new_data, default=lambda x: x.isoformat(), indent=4) if new_data else None,
-    )
-    db.session.add(change_log)
+    if old_data or new_data:
+        change_log = ChangeLog(
+            table_name=target.__tablename__,
+            operation=operation,
+            old_data=json.dumps(old_data, default=lambda x: x.isoformat(), indent=4) if old_data else None,
+            new_data=json.dumps(new_data, default=lambda x: x.isoformat(), indent=4) if new_data else None,
+        )
+        db.session.add(change_log)
+        db.session.commit()
 
 
 def add_listeners(model):
@@ -151,7 +158,6 @@ def add_listeners(model):
     event.listen(model, "after_delete", lambda m, c, t: log_changes(m, c, t, "DELETE"))
 
 
-add_listeners(User)
 add_listeners(Contact)
 add_listeners(Address)
 add_listeners(Partner)
