@@ -122,3 +122,14 @@ class UpdateOrderForm(FlaskForm):
     currency = StringField("Currency", validators=[DataRequired()], render_kw={"readonly": True})
     created_at = DateTimeLocalField("Created At", format="%Y-%m-%dT%H:%M", render_kw={"readonly": True})
     submit = SubmitField("Update Order", render_kw={"disabled": True})
+
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    submit = SubmitField("Reset Password")
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField("New Password", validators=[DataRequired()])
+    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")])
+    submit = SubmitField("Change Password")

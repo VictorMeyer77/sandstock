@@ -2,14 +2,19 @@ import re
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import login_required, login_user, logout_user
+from werkzeug.security import generate_password_hash
+from flask_mail import Message
 
+from sandstock.extensions import mail, get_serializer
 from sandstock.forms import (
     CreateOrderForm,
     CreatePartnerForm,
     CreateProductForm,
     CreateWarehouseForm,
+    ForgotPasswordForm,
     LoginForm,
     RegisterForm,
+    ResetPasswordForm,
     UpdateOrderForm,
     UpdatePartnerForm,
     UpdateProductForm,
@@ -408,3 +413,43 @@ def register_routes(app: Flask):
             created_at=order.created_at,
         )
         return render_template("edit_order.html", form=form, order=order)
+
+    @app.route("/forgot_password", methods=["GET", "POST"])
+    def forgot_password():
+        form = ForgotPasswordForm()
+
+        if form.validate_on_submit():
+            user = User.query.filter_by(email=form.email.data).first()
+            if user:
+                token = get_serializer().dumps(user.email, salt="reset-password")
+                reset_url = url_for("reset_password", token=token, _external=True)
+
+                msg = Message("Password Reset Request", sender="victormeyer2ci@gmail.com", recipients=[user.email])
+                msg.body = f"Click the link to reset your password: {reset_url}\nIf you didn't request this, ignore this email."
+                mail.send(msg)
+
+                flash("A password reset email has been sent.", "info")
+            else:
+                flash("No account found with that email.", "warning")
+        return render_template("forgot_password.html", form=form)
+
+    @app.route("/reset_password/<token>", methods=["GET", "POST"])
+    def reset_password(token):
+        try:
+            email = get_serializer().loads(token, salt="reset-password", max_age=3600)  # Token expires in 1 hour
+        except:
+            flash("Invalid or expired token", "danger")
+            return redirect(url_for("forgot_password"))
+
+        form = ResetPasswordForm()
+
+        if form.validate_on_submit():
+            user = User.query.filter_by(email=email).first()
+
+            if user:
+
+                user.password_hash = generate_password_hash(form.password.data)
+                db.session.commit()
+                flash("Your password has been reset!", "success")
+                return redirect(url_for("login"))
+        return render_template("reset_password.html", form=form)

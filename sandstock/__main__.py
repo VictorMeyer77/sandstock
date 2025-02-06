@@ -2,7 +2,8 @@ from flask import Flask
 from flask_login import LoginManager
 
 from sandstock.config import Config
-from sandstock.models import User, db
+from sandstock.extensions import db, mail, init_serializer
+from sandstock.models import User
 from sandstock.routes import register_routes
 
 
@@ -11,9 +12,10 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
+    mail.init_app(app)
+    init_serializer(app.config["SECRET_KEY"])
 
     with app.app_context():
-        # db.drop_all()
         db.create_all()
 
     login_manager = LoginManager(app)
