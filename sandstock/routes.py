@@ -66,6 +66,49 @@ def register_routes(app: Flask):
         flash("You have been logged out!", "success")
         return redirect(url_for("login"))
 
+    @app.route("/forgot_password", methods=["GET", "POST"])
+    def forgot_password():
+        form = ForgotPasswordForm()
+
+        if form.validate_on_submit():
+            user = User.query.filter_by(email=form.email.data).first()
+            if user:
+                token = get_serializer().dumps(user.email, salt="reset-password")
+                reset_url = url_for("reset_password", token=token, _external=True)
+
+                msg = Message("Password Reset Request", sender="victormeyer2ci@gmail.com", recipients=[user.email])
+                msg.body = (
+                    f"Click the link to reset your password: {reset_url}\n"
+                    "If you didn't request this, ignore this email."
+                )
+                mail.send(msg)
+
+                flash("A password reset email has been sent.", "info")
+            else:
+                flash("No account found with that email.", "warning")
+        return render_template("forgot_password.html", form=form)
+
+    @app.route("/reset_password/<token>", methods=["GET", "POST"])
+    def reset_password(token):
+        try:
+            email = get_serializer().loads(token, salt="reset-password", max_age=3600)
+        except Exception:
+            flash("Invalid or expired token", "danger")
+            return redirect(url_for("forgot_password"))
+
+        form = ResetPasswordForm()
+
+        if form.validate_on_submit():
+            user = User.query.filter_by(email=email).first()
+
+            if user:
+
+                user.password_hash = generate_password_hash(form.password.data)
+                db.session.commit()
+                flash("Your password has been reset!", "success")
+                return redirect(url_for("login"))
+        return render_template("reset_password.html", form=form)
+
     @app.route("/")
     @login_required
     def home():
@@ -84,7 +127,6 @@ def register_routes(app: Flask):
         if form.validate_on_submit():
             contact = Contact(email=form.email.data, phone_number=form.phone_number.data, modified_by=current_user.id)
             db.session.add(contact)
-            db.session.commit()
 
             address = Address(
                 street_address=form.street_address.data,
@@ -167,7 +209,7 @@ def register_routes(app: Flask):
     @login_required
     def get_partners():
         query = request.args.get("query", "")
-        results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), Partner.deleted == False).limit(10).all()
+        results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), Partner.deleted.is_(False)).limit(10).all()
         partners = [
             {
                 "id": partner.id,
@@ -266,7 +308,9 @@ def register_routes(app: Flask):
     @login_required
     def get_warehouses():
         query = request.args.get("query", "")
-        results = Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted == False).limit(10).all()
+        results = (
+            Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted.is_(False)).limit(10).all()
+        )
         warehouses = [
             {
                 "id": warehouse.id,
@@ -339,7 +383,7 @@ def register_routes(app: Flask):
     @login_required
     def get_products():
         query = request.args.get("query", "")
-        results = Product.query.filter(Product.name.ilike(f"%{query}%"), Product.deleted == False).limit(10).all()
+        results = Product.query.filter(Product.name.ilike(f"%{query}%"), Product.deleted.is_(False)).limit(10).all()
         products = [
             {
                 "id": product.id,
@@ -437,43 +481,3 @@ def register_routes(app: Flask):
             modified_by=current_user.email,
         )
         return render_template("edit_order.html", form=form, order=order)
-
-    @app.route("/forgot_password", methods=["GET", "POST"])
-    def forgot_password():
-        form = ForgotPasswordForm()
-
-        if form.validate_on_submit():
-            user = User.query.filter_by(email=form.email.data).first()
-            if user:
-                token = get_serializer().dumps(user.email, salt="reset-password")
-                reset_url = url_for("reset_password", token=token, _external=True)
-
-                msg = Message("Password Reset Request", sender="victormeyer2ci@gmail.com", recipients=[user.email])
-                msg.body = f"Click the link to reset your password: {reset_url}\nIf you didn't request this, ignore this email."
-                mail.send(msg)
-
-                flash("A password reset email has been sent.", "info")
-            else:
-                flash("No account found with that email.", "warning")
-        return render_template("forgot_password.html", form=form)
-
-    @app.route("/reset_password/<token>", methods=["GET", "POST"])
-    def reset_password(token):
-        try:
-            email = get_serializer().loads(token, salt="reset-password", max_age=3600)  # Token expires in 1 hour
-        except:
-            flash("Invalid or expired token", "danger")
-            return redirect(url_for("forgot_password"))
-
-        form = ResetPasswordForm()
-
-        if form.validate_on_submit():
-            user = User.query.filter_by(email=email).first()
-
-            if user:
-
-                user.password_hash = generate_password_hash(form.password.data)
-                db.session.commit()
-                flash("Your password has been reset!", "success")
-                return redirect(url_for("login"))
-        return render_template("reset_password.html", form=form)
