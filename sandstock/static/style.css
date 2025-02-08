@@ -1,7 +1,7 @@
 /* === GENERAL STYLES === */
 body {
-    background: linear-gradient(145deg, #f3f4f6, #ffffff);
-    color: #1f2937;
+    background: linear-gradient(145deg, #e0f7fa, #ffffff);
+    color: #2c3e50;
     font-family: 'Helvetica Neue', sans-serif;
     overflow-x: hidden;
     margin: 0;
@@ -19,27 +19,27 @@ body {
 
 /* === HEADINGS === */
 h1, h2, h3, h4, h5, h6 {
-    color: #111827;  /* Darker shade for headings */
+    color: #2c3e50;
     font-weight: 800;
     letter-spacing: 0.5px;
     margin-bottom: 20px;
 }
 
 h1 {
-    font-size: 2rem;  /* Smaller font size */
-    font-weight: 500;  /* Lighter font weight */
-    color: #111827;  /* Darker shade for headings */
-    letter-spacing: 0.5px;  /* Slight letter spacing */
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    letter-spacing: 0.5px;
     margin-top: 20px;
     margin-bottom: 15px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);  /* Very subtle shadow for depth */
-    line-height: 1.3;  /* Slightly increased line height for better readability */
-    transition: color 0.3s ease, text-shadow 0.3s ease;  /* Smooth transition effects */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+    line-height: 1.3;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 h1:hover {
-    color: #3b82f6;  /* Vibrant blue on hover */
-    text-shadow: 1px 1px 3px rgba(59, 130, 246, 0.1);  /* Slightly stronger shadow on hover */
+    color: #1e88e5;
+    text-shadow: 1px 1px 3px rgba(30, 136, 229, 0.1);
 }
 
 h2 {
@@ -64,7 +64,7 @@ h6 {
 
 /* === NAVBAR STYLING === */
 .navbar {
-    background: #3b82f6;  /* Vibrant blue background */
+    background: #1e88e5;
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
     padding: 15px 40px;
     border-radius: 0 0 10px 10px;
@@ -87,7 +87,7 @@ h6 {
 }
 
 .navbar-nav .nav-link:hover {
-    color: #d1d5db !important;  /* Light gray hover effect */
+    color: #d1d5db !important;
 }
 
 .navbar-toggler {
@@ -101,65 +101,65 @@ h6 {
 /* === BUTTON STYLES === */
 .btn {
     font-weight: 600;
-    border-radius: 8px;  /* Slightly rounded corners */
-    padding: 12px 24px;  /* Increased padding for a more prominent button */
+    border-radius: 8px;
+    padding: 12px 24px;
     transition: transform 0.2s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-    font-size: 14px;  /* Slightly bigger font size */
+    font-size: 14px;
     text-transform: uppercase;
-    letter-spacing: 1.2px;  /* Added letter-spacing for a cleaner, more modern look */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Subtle shadow for depth */
+    letter-spacing: 1.2px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: inline-block;
     cursor: pointer;
     border: none;
-    white-space: nowrap;  /* Prevent text from wrapping */
+    white-space: nowrap;
 }
 
 /* === BUTTON PRIMARY === */
 .btn-primary {
-    background-color: #3b82f6;  /* Vibrant blue background */
+    background-color: #1e88e5;
     color: #ffffff;
 }
 
 .btn-primary:hover {
-    background-color: #2563eb;  /* Slightly darker blue on hover */
-    box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);  /* Stronger shadow on hover */
-    transform: translateY(-3px);  /* More noticeable lift effect */
+    background-color: #1976d2;
+    box-shadow: 0 6px 12px rgba(25, 118, 210, 0.3);
+    transform: translateY(-3px);
 }
 
 /* === BUTTON DANGER === */
 .btn-danger {
-    background-color: #ef4444;  /* Bright red background */
+    background-color: #e53935;
     color: #ffffff;
 }
 
 .btn-danger:hover {
-    background-color: #dc2626;  /* Slightly darker red on hover */
-    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);  /* Stronger shadow on hover */
-    transform: translateY(-3px);  /* More noticeable lift effect */
+    background-color: #c62828;
+    box-shadow: 0 6px 12px rgba(198, 40, 40, 0.3);
+    transform: translateY(-3px);
 }
 
 /* === BUTTON SUCCESS === */
 .btn-success {
-    background-color: #22c55e;  /* Vibrant green background */
+    background-color: #4caf50;
     color: #ffffff;
 }
 
 .btn-success:hover {
-    background-color: #16a34a;  /* Slightly darker green on hover */
-    box-shadow: 0 6px 12px rgba(34, 197, 94, 0.3);  /* Stronger shadow on hover */
-    transform: translateY(-3px);  /* More noticeable lift effect */
+    background-color: #43a047;
+    box-shadow: 0 6px 12px rgba(67, 160, 71, 0.3);
+    transform: translateY(-3px);
 }
 
 /* === BUTTON SECONDARY === */
 .btn-secondary {
-    background-color: #6b7280;  /* Neutral gray background */
+    background-color: #9e9e9e;
     color: #ffffff;
 }
 
 .btn-secondary:hover {
-    background-color: #4b5563;  /* Slightly darker gray on hover */
-    box-shadow: 0 6px 12px rgba(107, 114, 128, 0.3);  /* Stronger shadow on hover */
-    transform: translateY(-3px);  /* More noticeable lift effect */
+    background-color: #757575;
+    box-shadow: 0 6px 12px rgba(117, 117, 117, 0.3);
+    transform: translateY(-3px);
 }
 
 /* === FORM STYLING === */
@@ -169,8 +169,8 @@ h6 {
 
 .form-control {
     background: #ffffff;
-    color: #1f2937;
-    border: 1px solid #d1d5db;  /* Light gray border */
+    color: #2c3e50;
+    border: 1px solid #d1d5db;
     padding: 16px;
     border-radius: 10px;
     transition: 0.3s ease-in-out;
@@ -178,23 +178,23 @@ h6 {
 }
 
 .form-control:focus {
-    border-color: #3b82f6;  /* Vibrant blue border on focus */
-    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+    border-color: #1e88e5;
+    box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.25);
 }
 
 /* === CARD STYLES (Glassmorphism Effect) === */
 .card {
-    background: rgba(255, 255, 255, 0.9);  /* Semi-transparent white */
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
     border: 1px solid #e5e7eb;
     box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
     padding: 30px;
     margin-bottom: 30px;
-    backdrop-filter: blur(15px);  /* Glassmorphism effect */
+    backdrop-filter: blur(15px);
 }
 
 .card h2 {
-    color: #3b82f6;
+    color: #1e88e5;
 }
 
 /* === TABLE STYLES === */
@@ -206,7 +206,7 @@ h6 {
 
 .table th {
     background-color: #f9fafb;
-    color: #3b82f6;
+    color: #1e88e5;
     padding: 15px;
     text-align: left;
     font-weight: 700;
@@ -218,12 +218,12 @@ h6 {
 }
 
 .table tbody tr:hover {
-    background-color: rgba(59, 130, 246, 0.05);
+    background-color: rgba(30, 136, 229, 0.05);
 }
 
 /* === FOOTER === */
 footer {
-    background: #3b82f6;
+    background: #1e88e5;
     color: #ffffff;
     box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -234,11 +234,11 @@ footer {
 /* === SCROLLBAR CUSTOMIZATION === */
 ::-webkit-scrollbar {
     width: 12px;
-    background-color: #f9fafb;  /* Light background */
+    background-color: #f9fafb;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #3b82f6;
+    background: #1e88e5;
     border-radius: 10px;
 }
 
@@ -282,7 +282,7 @@ footer {
 
 .search-bar button {
     padding: 12px;
-    background-color: #3b82f6;
+    background-color: #1e88e5;
     color: white;
     border: none;
     border-radius: 10px;
@@ -290,7 +290,7 @@ footer {
 }
 
 .search-bar button:hover {
-    background-color: #2563eb;
+    background-color: #1976d2;
 }
 
 /* === ALERT STYLES === */
@@ -329,7 +329,7 @@ footer {
 hr {
     border: none;
     height: 3px;
-    background: linear-gradient(to right, #3b82f6, #2563eb);
+    background: linear-gradient(to right, #1e88e5, #1976d2);
     margin: 25px 0;
     opacity: 0.8;
     border-radius: 3px;
@@ -355,7 +355,7 @@ hr {
 
 .form-group-inline .input-group .btn {
     padding: 12px;
-    background-color: #3b82f6;
+    background-color: #1e88e5;
     color: white;
     border: none;
     border-radius: 10px;
@@ -363,7 +363,7 @@ hr {
 }
 
 .form-group-inline .input-group .btn:hover {
-    background-color: #2563eb;
+    background-color: #1976d2;
 }
 
 /* === FORM LABEL STYLES === */
