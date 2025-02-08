@@ -9,8 +9,8 @@ class Config:
     MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USERNAME = "victormeyer2ci@gmail.com"
-    MAIL_PASSWORD = "lixp tvdp oqdj qhcp"
+    MAIL_USERNAME = ""
+    MAIL_PASSWORD = ""
 
 
 class TestingConfig(Config):
