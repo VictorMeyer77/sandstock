@@ -4,7 +4,6 @@
 <div class="container">
     <div class="card">
         <h1>Add Order</h1>
-        <hr>
         <form method="POST" action="{{ url_for('add_order') }}">
             {{ form.hidden_tag() }}
 
@@ -25,70 +24,79 @@
                     {% endif %}
                 </div>
             </div>
-
+            <hr>
             <div class="form-group row">
                 <div class="col-md-3">
                     {{ form.product_name.label }}
                 </div>
                 <div class="col-md-9">
-                    <input type="text" id="product-search" placeholder="Search Products" class="form-control">
-                </div>
-                <div class="col-md-9 offset-md-3">
-                    {{ form.product_name(class="form-control select-box") }}
-                    {% if form.product_name.errors %}
-                        <div class="alert alert-danger">
-                            <ul>
-                                {% for error in form.product_name.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
+                    <div class="input-group">
+                        <input type="text" id="product-search" placeholder="Search Products" class="form-control">
+                        <a href="{{ url_for('add_product') }}" class="btn btn-secondary ml-2">Add</a>
+                    </div>
+                    <div class="mt-2">
+                        {{ form.product_name(class="form-control select-box") }}
+                        {% if form.product_name.errors %}
+                            <div class="alert alert-danger">
+                                <ul>
+                                    {% for error in form.product_name.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-
+            <hr>
             <div class="form-group row">
                 <div class="col-md-3">
                     {{ form.partner_name.label }}
                 </div>
                 <div class="col-md-9">
-                    <input type="text" id="partner-search" placeholder="Search Partners" class="form-control">
-                </div>
-                <div class="col-md-9 offset-md-3">
-                    {{ form.partner_name(class="form-control select-box") }}
-                    {% if form.partner_name.errors %}
-                        <div class="alert alert-danger">
-                            <ul>
-                                {% for error in form.partner_name.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
+                    <div class="input-group">
+                        <input type="text" id="partner-search" placeholder="Search Partners" class="form-control">
+                        <a href="{{ url_for('add_partner') }}" class="btn btn-secondary ml-2">Add</a>
+                    </div>
+                    <div class="mt-2">
+                        {{ form.partner_name(class="form-control select-box") }}
+                        {% if form.partner_name.errors %}
+                            <div class="alert alert-danger">
+                                <ul>
+                                    {% for error in form.partner_name.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-
+            <hr>
             <div class="form-group row">
                 <div class="col-md-3">
                     {{ form.warehouse_name.label }}
                 </div>
                 <div class="col-md-9">
-                    <input type="text" id="warehouse-search" placeholder="Search Warehouses" class="form-control">
-                </div>
-                <div class="col-md-9 offset-md-3">
-                    {{ form.warehouse_name(class="form-control select-box") }}
-                    {% if form.warehouse_name.errors %}
-                        <div class="alert alert-danger">
-                            <ul>
-                                {% for error in form.warehouse_name.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
+                    <div class="input-group">
+                        <input type="text" id="warehouse-search" placeholder="Search Warehouses" class="form-control">
+                        <a href="{{ url_for('add_warehouse') }}" class="btn btn-secondary ml-2">Add</a>
+                    </div>
+                    <div class="mt-2">
+                        {{ form.warehouse_name(class="form-control select-box") }}
+                        {% if form.warehouse_name.errors %}
+                            <div class="alert alert-danger">
+                                <ul>
+                                    {% for error in form.warehouse_name.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-
+            <hr>
             <div class="form-group row">
                 <div class="col-md-3">
                     {{ form.quantity.label }}

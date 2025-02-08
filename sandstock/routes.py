@@ -53,7 +53,6 @@ def register_routes(app: Flask):
             user = User.query.filter_by(email=form.email.data).first()
             if user and user.check_password(form.password.data):
                 login_user(user)
-                flash("Logged in successfully!", "success")
                 return redirect(url_for("home"))
             else:
                 flash("Invalid email or password!", "danger")

@@ -69,7 +69,10 @@ def test_register_with_existing_email(client):
 
 def test_login_with_existing_account(client, app):
     response = client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
-    assert b"Logged in successfully!" in response.data
+    assert b"Partners" in response.data
+    assert b"Warehouses" in response.data
+    assert b"Products" in response.data
+    assert b"Orders" in response.data
 
 
 def test_login_with_unknown_account(client, app):
