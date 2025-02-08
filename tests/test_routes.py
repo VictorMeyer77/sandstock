@@ -203,12 +203,12 @@ def test_edit_partner(client, app):
 
     assert b"Partner updated successfully!" in response.data
 
-    updated_partner = Partner.query.get(partner.id)
+    updated_partner = db.session.get(Partner, partner.id)
     assert updated_partner.name == "Updated Partner Name"
     assert updated_partner.contact_person == "Jane Doe"
-    updated_contact = Contact.query.get(updated_partner.contact_id)
+    updated_contact = db.session.get(Contact, updated_partner.contact_id)
     assert updated_contact.email == "updated@testpartner.com"
-    updated_address = Address.query.get(updated_partner.address_id)
+    updated_address = db.session.get(Address, updated_partner.address_id)
     assert updated_address.city == "Los Angeles"
     change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
     assert ChangeLog.query.count() == 6
@@ -253,7 +253,7 @@ def test_delete_partner(client, app):
     response = client.post(f"/partner/{partner.id}/delete", follow_redirects=True)
     assert b"Partner deleted successfully!" in response.data
 
-    deleted_partner = Partner.query.get(partner.id)
+    deleted_partner = db.session.get(Partner, partner.id)
     assert deleted_partner.deleted is True
     change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
     assert ChangeLog.query.count() == 4
@@ -421,11 +421,11 @@ def test_edit_warehouse(client, app):
 
     assert b"Warehouse updated successfully!" in response.data
 
-    updated_warehouse = Warehouse.query.get(warehouse.id)
+    updated_warehouse = db.session.get(Warehouse, warehouse.id)
     assert updated_warehouse.name == "Updated Warehouse Name"
-    updated_contact = Contact.query.get(updated_warehouse.contact_id)
+    updated_contact = db.session.get(Contact, updated_warehouse.contact_id)
     assert updated_contact.email == "updated@testwarehouse.com"
-    updated_address = Address.query.get(updated_warehouse.address_id)
+    updated_address = db.session.get(Address, updated_warehouse.address_id)
     assert updated_address.city == "New City"
     change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
     assert ChangeLog.query.count() == 6
@@ -468,7 +468,7 @@ def test_delete_warehouse(client, app):
 
     response = client.post(f"/warehouse/{warehouse.id}/delete", follow_redirects=True)
     assert b"Warehouse deleted successfully!" in response.data
-    deleted_warehouse = Warehouse.query.get(warehouse.id)
+    deleted_warehouse = db.session.get(Warehouse, warehouse.id)
     assert deleted_warehouse.deleted is True
     change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
     assert ChangeLog.query.count() == 4
@@ -601,7 +601,7 @@ def test_edit_product(client, app):
 
     assert b"Product updated successfully!" in response.data
 
-    updated_product = Product.query.get(product.id)
+    updated_product = db.session.get(Product, product.id)
     assert updated_product.name == "Updated Product Name"
     assert updated_product.category_label == "Updated Category"
     assert updated_product.description == "This is an updated product."
@@ -635,7 +635,7 @@ def test_delete_product(client, app):
     response = client.post(f"/product/{product.id}/delete", follow_redirects=True)
     assert b"Product deleted successfully!" in response.data
 
-    deleted_product = Product.query.get(product.id)
+    deleted_product = db.session.get(Product, product.id)
     assert deleted_product.deleted is True
 
     change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
@@ -769,10 +769,12 @@ def test_add_order(client, app):
     assert order.quantity == 5
     assert order.unit_price == 10.0
     assert order.currency == "USD"
+    product = Product.query.first()
+    assert product.quantity_available == 5
     change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
-    assert ChangeLog.query.count() == 6
+    assert ChangeLog.query.count() == 7
     assert change_log is not None
-    assert "TRANSACTION" in change_log.new_data
+    assert "quantity_available" in change_log.new_data
 
 
 def test_add_order_unauthenticated(client):

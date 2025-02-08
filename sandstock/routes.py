@@ -431,6 +431,8 @@ def register_routes(app: Flask):
                 currency=form.currency.data,
                 modified_by=current_user.id,
             )
+            product = Product.query.get_or_404(order.product_id)
+            product.quantity_available += order.quantity
             db.session.add(order)
             db.session.commit()
             flash("Order added successfully!", "success")
