@@ -1,8 +1,6 @@
-import json
 from datetime import datetime, timezone
 
 from flask_login import UserMixin
-from sqlalchemy import event
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from sandstock.extensions import db
@@ -119,59 +117,3 @@ class Order(db.Model):  # type: ignore
     currency = db.Column(db.String(3), nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), nullable=False)
     modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
-
-
-# Change Data Capture
-
-
-class ChangeLog(db.Model):  # type: ignore
-    __tablename__ = "change_log"
-
-    id = db.Column(db.Integer, primary_key=True)
-    table_name = db.Column(db.String(50), nullable=False)
-    operation = db.Column(db.String(10), nullable=False)  # INSERT, UPDATE, DELETE
-    old_data = db.Column(db.Text, nullable=True)
-    new_data = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-
-
-def log_changes(mapper, connection, target, operation):
-    old_data = {}
-    new_data = {}
-
-    if operation == "UPDATE":
-        state = db.inspect(target)
-        for attr in state.attrs:
-            hist = state.get_history(attr.key, True)
-            if hist.has_changes():
-                old_data[attr.key] = hist.deleted[0]
-                new_data[attr.key] = hist.added[0]
-
-    elif operation == "INSERT":
-        new_data = {c.name: getattr(target, c.name) for c in target.__table__.columns}
-
-    elif operation == "DELETE":
-        old_data = {c.name: getattr(target, c.name) for c in target.__table__.columns}
-
-    if old_data or new_data:
-        change_log = ChangeLog(
-            table_name=target.__tablename__,
-            operation=operation,
-            old_data=json.dumps(old_data, default=lambda x: x.isoformat(), indent=4) if old_data else None,
-            new_data=json.dumps(new_data, default=lambda x: x.isoformat(), indent=4) if new_data else None,
-        )
-        db.session.add(change_log)
-
-
-def add_listeners(model):
-    event.listen(model, "after_insert", lambda m, c, t: log_changes(m, c, t, "INSERT"))
-    event.listen(model, "after_update", lambda m, c, t: log_changes(m, c, t, "UPDATE"))
-    event.listen(model, "after_delete", lambda m, c, t: log_changes(m, c, t, "DELETE"))
-
-
-add_listeners(Contact)
-add_listeners(Address)
-add_listeners(Partner)
-add_listeners(Warehouse)
-add_listeners(Product)
-add_listeners(Order)

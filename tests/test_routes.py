@@ -2,7 +2,7 @@ import pytest
 
 from sandstock import User, create_app, db
 from sandstock.config import TestingConfig
-from sandstock.models import Address, ChangeLog, Contact, Order, Partner, Product, Warehouse
+from sandstock.models import Address, Contact, Order, Partner, Product, Warehouse
 
 
 @pytest.fixture
@@ -139,10 +139,6 @@ def test_add_partner(client, app):
     contact = Contact.query.filter_by(id=partner.contact_id).first()
     assert contact is not None
     assert contact.email == "contact@testpartner.com"
-    change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
-    assert ChangeLog.query.count() == 3
-    assert change_log is not None
-    assert "Test Partner" in change_log.new_data
 
 
 def test_add_partner_unauthenticated(client):
@@ -210,10 +206,6 @@ def test_edit_partner(client, app):
     assert updated_contact.email == "updated@testpartner.com"
     updated_address = db.session.get(Address, updated_partner.address_id)
     assert updated_address.city == "Los Angeles"
-    change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
-    assert ChangeLog.query.count() == 6
-    assert change_log is not None
-    assert "Jane Doe" in change_log.new_data
 
 
 def test_edit_partner_unauthenticated(client):
@@ -255,10 +247,6 @@ def test_delete_partner(client, app):
 
     deleted_partner = db.session.get(Partner, partner.id)
     assert deleted_partner.deleted is True
-    change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
-    assert ChangeLog.query.count() == 4
-    assert change_log is not None
-    assert "true" in change_log.new_data
 
 
 def test_delete_partner_unauthenticated(client):
@@ -362,10 +350,6 @@ def test_add_warehouse(client, app):
     address = Address.query.filter_by(id=warehouse.address_id).first()
     assert address is not None
     assert address.city == "Warehouse City"
-    change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
-    assert ChangeLog.query.count() == 3
-    assert change_log is not None
-    assert "Test" in change_log.new_data
 
 
 def test_add_warehouse_unauthenticated(client):
@@ -427,10 +411,6 @@ def test_edit_warehouse(client, app):
     assert updated_contact.email == "updated@testwarehouse.com"
     updated_address = db.session.get(Address, updated_warehouse.address_id)
     assert updated_address.city == "New City"
-    change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
-    assert ChangeLog.query.count() == 6
-    assert change_log is not None
-    assert "Name" in change_log.new_data
 
 
 def test_edit_warehouse_unauthenticated(client):
@@ -470,10 +450,6 @@ def test_delete_warehouse(client, app):
     assert b"Warehouse deleted successfully!" in response.data
     deleted_warehouse = db.session.get(Warehouse, warehouse.id)
     assert deleted_warehouse.deleted is True
-    change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
-    assert ChangeLog.query.count() == 4
-    assert change_log is not None
-    assert "true" in change_log.new_data
 
 
 def test_delete_warehouse_unauthenticated(client):
@@ -559,10 +535,6 @@ def test_add_product(client, app):
     assert product.name == "Test Product"
     assert product.category_label == "Test Category"
     assert product.description == "This is a test product."
-    change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
-    assert ChangeLog.query.count() == 1
-    assert change_log is not None
-    assert "Test Product" in change_log.new_data
 
 
 def test_add_product_unauthenticated(client):
@@ -606,10 +578,6 @@ def test_edit_product(client, app):
     assert updated_product.category_label == "Updated Category"
     assert updated_product.description == "This is an updated product."
     assert updated_product.quantity_available == 0
-    change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
-    assert ChangeLog.query.count() == 2
-    assert change_log is not None
-    assert "Updated Product Name" in change_log.new_data
 
 
 def test_edit_product_unauthenticated(client):
@@ -637,11 +605,6 @@ def test_delete_product(client, app):
 
     deleted_product = db.session.get(Product, product.id)
     assert deleted_product.deleted is True
-
-    change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
-    assert ChangeLog.query.count() == 2
-    assert change_log is not None
-    assert "true" in change_log.new_data
 
 
 def test_delete_product_unauthenticated(client):
@@ -771,10 +734,6 @@ def test_add_order(client, app):
     assert order.currency == "USD"
     product = Product.query.first()
     assert product.quantity_available == 5
-    change_log = ChangeLog.query.order_by(ChangeLog.id.desc()).first()
-    assert ChangeLog.query.count() == 7
-    assert change_log is not None
-    assert "quantity_available" in change_log.new_data
 
 
 def test_add_order_unauthenticated(client):
