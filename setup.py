@@ -22,7 +22,7 @@ def read_requirements(path):
 
 setup(
     name="sandstock",
-    version=read("sandstock", "VERSION"),
+    version=read("VERSION"),
     description="Stream each new rows of a file and write in kafka",
     url="https://github.com/VictorMeyer77/sandstock",
     long_description=read("README.md"),

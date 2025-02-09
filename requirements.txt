@@ -3,5 +3,5 @@ flask-sqlalchemy
 flask-login
 flask-wtf
 flask-mail
-flask-admin
 email-validator
+gunicorn
