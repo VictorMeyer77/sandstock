@@ -16,7 +16,7 @@ def create_app(config_class=Config):
 
     # Initialize extensions
     db.init_app(app)
-    migrate = Migrate(app, db)
+    Migrate(app, db)
     mail.init_app(app)
     init_serializer(app.config["SECRET_KEY"])
 

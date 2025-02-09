@@ -25,22 +25,17 @@ install:          ## Install the project in dev mode.
 fmt:              ## Format code using black & isort.
 	$(ENV_PREFIX)isort sandstock/
 	$(ENV_PREFIX)isort tests/
-	$(ENV_PREFIX)isort scripts/
 	$(ENV_PREFIX)black -l 120 sandstock/
 	$(ENV_PREFIX)black -l 120 tests/
-	$(ENV_PREFIX)black -l 120 scripts/
 
 .PHONY: lint
 lint:             ## Run pep8, black, mypy linters.
 	$(ENV_PREFIX)flake8 --max-line-length 120 sandstock/
 	$(ENV_PREFIX)flake8 --max-line-length 120 tests/
-	$(ENV_PREFIX)flake8 --max-line-length 120 scripts/
 	$(ENV_PREFIX)black -l 120 --check sandstock/
 	$(ENV_PREFIX)black -l 120 --check tests/
-	$(ENV_PREFIX)black -l 120 --check scripts/
 	$(ENV_PREFIX)mypy --ignore-missing-imports sandstock/
 	$(ENV_PREFIX)mypy --ignore-missing-imports tests/
-	$(ENV_PREFIX)mypy --ignore-missing-imports scripts/
 
 .PHONY: test
 test: lint        ## Run tests and generate coverage report.
