@@ -2,6 +2,7 @@ import logging
 
 from flask import Flask
 from flask_login import LoginManager
+from flask_migrate import Migrate
 
 from sandstock.config import Config
 from sandstock.extensions import db, init_serializer, mail
@@ -15,6 +16,7 @@ def create_app(config_class=Config):
 
     # Initialize extensions
     db.init_app(app)
+    migrate = Migrate(app, db)
     mail.init_app(app)
     init_serializer(app.config["SECRET_KEY"])
 
