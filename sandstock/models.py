@@ -1,29 +1,6 @@
 from datetime import datetime, timezone
 
-from flask_login import UserMixin
-from werkzeug.security import check_password_hash, generate_password_hash
-
 from sandstock.extensions import db
-
-
-class User(db.Model, UserMixin):  # type: ignore
-    __tablename__ = "dim_user"
-
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), nullable=False, unique=False)
-    email = db.Column(db.String(150), nullable=False, unique=True)
-    password_hash = db.Column(db.String(200), nullable=False)
-    created_at = db.Column(db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at = db.Column(
-        db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
-    )
-    deleted = db.Column(db.Boolean, default=False, nullable=False)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
 
 
 class Contact(db.Model):  # type: ignore
@@ -36,7 +13,7 @@ class Contact(db.Model):  # type: ignore
     updated_at = db.Column(
         db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
     )
-    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
+    modified_by = db.Column(db.String(254), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
@@ -53,7 +30,7 @@ class Address(db.Model):  # type: ignore
     updated_at = db.Column(
         db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
     )
-    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
+    modified_by = db.Column(db.String(254), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
@@ -69,7 +46,7 @@ class Partner(db.Model):  # type: ignore
     updated_at = db.Column(
         db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
     )
-    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
+    modified_by = db.Column(db.String(254), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
@@ -84,7 +61,7 @@ class Warehouse(db.Model):  # type: ignore
     updated_at = db.Column(
         db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
     )
-    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
+    modified_by = db.Column(db.String(254), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
@@ -100,7 +77,7 @@ class Product(db.Model):  # type: ignore
     updated_at = db.Column(
         db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
     )
-    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
+    modified_by = db.Column(db.String(254), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
@@ -116,4 +93,4 @@ class Order(db.Model):  # type: ignore
     unit_price = db.Column(db.Float, nullable=False)
     currency = db.Column(db.String(3), nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), nullable=False)
-    modified_by = db.Column(db.Integer, db.ForeignKey("dim_user.id"), nullable=False)
+    modified_by = db.Column(db.String(254), nullable=False)

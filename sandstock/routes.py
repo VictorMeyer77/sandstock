@@ -1,115 +1,23 @@
 import re
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
-from flask_login import current_user, login_required, login_user, logout_user
-from flask_mail import Message
-from werkzeug.security import generate_password_hash
 
-from sandstock.extensions import get_serializer, mail
 from sandstock.forms import (
     CreateOrderForm,
     CreatePartnerForm,
     CreateProductForm,
     CreateWarehouseForm,
-    ForgotPasswordForm,
-    LoginForm,
-    RegisterForm,
-    ResetPasswordForm,
     UpdateOrderForm,
     UpdatePartnerForm,
     UpdateProductForm,
     UpdateWarehouseForm,
 )
-from sandstock.models import Address, Contact, Order, Partner, Product, User, Warehouse, db
+from sandstock.models import Address, Contact, Order, Partner, Product, Warehouse, db
 
 
 def register_routes(app: Flask):
 
-    # Login/Logout
-
-    @app.route("/register", methods=["GET", "POST"])
-    def register():
-        form = RegisterForm()
-        if form.validate_on_submit():
-            user = User.query.filter_by(email=form.email.data).first()
-            if user:
-                flash("Email already exists!", "danger")
-            else:
-                new_user = User(
-                    username=form.username.data,
-                    email=form.email.data,
-                )
-                new_user.set_password(form.password.data)
-                db.session.add(new_user)
-                db.session.commit()
-                flash("Account created successfully!", "success")
-                return redirect(url_for("login"))
-        return render_template("register.html", form=form)
-
-    @app.route("/login", methods=["GET", "POST"])
-    def login():
-        form = LoginForm()
-        if form.validate_on_submit():
-            user = User.query.filter_by(email=form.email.data).first()
-            if user and user.check_password(form.password.data):
-                login_user(user)
-                return redirect(url_for("home"))
-            else:
-                flash("Invalid email or password!", "danger")
-        return render_template("login.html", form=form)
-
-    @app.route("/logout")
-    @login_required
-    def logout():
-        logout_user()
-        flash("You have been logged out!", "success")
-        return redirect(url_for("login"))
-
-    @app.route("/forgot_password", methods=["GET", "POST"])
-    def forgot_password():
-        form = ForgotPasswordForm()
-
-        if form.validate_on_submit():
-            user = User.query.filter_by(email=form.email.data).first()
-            if user:
-                token = get_serializer().dumps(user.email, salt="reset-password")
-                reset_url = url_for("reset_password", token=token, _external=True)
-
-                msg = Message("Password Reset Request", sender="victormeyer2ci@gmail.com", recipients=[user.email])
-                msg.body = (
-                    f"Click the link to reset your password: {reset_url}\n"
-                    "If you didn't request this, ignore this email."
-                )
-                mail.send(msg)
-
-                flash("A password reset email has been sent.", "info")
-            else:
-                flash("No account found with that email.", "warning")
-        return render_template("forgot_password.html", form=form)
-
-    @app.route("/reset_password/<token>", methods=["GET", "POST"])
-    def reset_password(token):
-        try:
-            email = get_serializer().loads(token, salt="reset-password", max_age=3600)
-        except Exception:
-            flash("Invalid or expired token", "danger")
-            return redirect(url_for("forgot_password"))
-
-        form = ResetPasswordForm()
-
-        if form.validate_on_submit():
-            user = User.query.filter_by(email=email).first()
-
-            if user:
-
-                user.password_hash = generate_password_hash(form.password.data)
-                db.session.commit()
-                flash("Your password has been reset!", "success")
-                return redirect(url_for("login"))
-        return render_template("reset_password.html", form=form)
-
     @app.route("/")
-    @login_required
     def home():
         orders = Order.query.filter_by().limit(10).all()
         partners = Partner.query.filter_by(deleted=False).limit(10).all()
@@ -120,11 +28,11 @@ def register_routes(app: Flask):
     # Partner
 
     @app.route("/partner/add", methods=["GET", "POST"])
-    @login_required
     def add_partner():
+        user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
         form = CreatePartnerForm()
         if form.validate_on_submit():
-            contact = Contact(email=form.email.data, phone_number=form.phone_number.data, modified_by=current_user.id)
+            contact = Contact(email=form.email.data, phone_number=form.phone_number.data, modified_by=user_email)
             db.session.add(contact)
 
             address = Address(
@@ -133,7 +41,7 @@ def register_routes(app: Flask):
                 state=form.state.data,
                 postal_code=form.postal_code.data,
                 country=form.country.data,
-                modified_by=current_user.id,
+                modified_by=user_email,
             )
             db.session.add(address)
             db.session.commit()
@@ -143,7 +51,7 @@ def register_routes(app: Flask):
                 contact_person=form.contact_person.data,
                 address_id=address.id,
                 contact_id=contact.id,
-                modified_by=current_user.id,
+                modified_by=user_email,
             )
             db.session.add(partner)
             db.session.commit()
@@ -154,12 +62,11 @@ def register_routes(app: Flask):
         return render_template("add_partner.html", form=form)
 
     @app.route("/partner/<int:partner_id>/edit", methods=["GET", "POST"])
-    @login_required
     def edit_partner(partner_id):
+        user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
         partner = Partner.query.get_or_404(partner_id)
         contact = Contact.query.get_or_404(partner.contact_id)
         address = Address.query.get_or_404(partner.address_id)
-        modified_by = User.query.get_or_404(partner.modified_by).email
 
         form = UpdatePartnerForm(
             name=partner.name,
@@ -173,21 +80,24 @@ def register_routes(app: Flask):
             country=address.country,
             created_at=partner.created_at,
             updated_at=partner.updated_at,
-            modified_by=modified_by,
+            modified_by=partner.modified_by,
         )
 
         if form.validate_on_submit():
             partner.name = form.name.data
             partner.contact_person = form.contact_person.data
+            partner.modified_by = user_email
 
             contact.email = form.email.data
             contact.phone_number = form.phone_number.data
+            contact.modified_by = user_email
 
             address.street_address = form.street_address.data
             address.city = form.city.data
             address.state = form.state.data
             address.postal_code = form.postal_code.data
             address.country = form.country.data
+            address.modified_by = user_email
 
             db.session.commit()
             flash("Partner updated successfully!", "success")
@@ -196,16 +106,16 @@ def register_routes(app: Flask):
         return render_template("edit_partner.html", form=form, partner=partner)
 
     @app.route("/partner/<int:partner_id>/delete", methods=["POST"])
-    @login_required
     def delete_partner(partner_id):
+        user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
         partner = Partner.query.get_or_404(partner_id)
         partner.deleted = True
+        partner.modified_by = user_email
         db.session.commit()
         flash("Partner deleted successfully!", "success")
         return redirect(url_for("home"))
 
     @app.route("/partner/get", methods=["GET"])
-    @login_required
     def get_partners():
         query = request.args.get("query", "")
         results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), Partner.deleted.is_(False)).limit(10).all()
@@ -227,11 +137,11 @@ def register_routes(app: Flask):
     # Warehouse
 
     @app.route("/warehouse/add", methods=["GET", "POST"])
-    @login_required
     def add_warehouse():
+        user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
         form = CreateWarehouseForm()
         if form.validate_on_submit():
-            contact = Contact(email=form.email.data, phone_number=form.phone_number.data, modified_by=current_user.id)
+            contact = Contact(email=form.email.data, phone_number=form.phone_number.data, modified_by=user_email)
             db.session.add(contact)
             db.session.commit()
 
@@ -241,13 +151,13 @@ def register_routes(app: Flask):
                 state=form.state.data,
                 postal_code=form.postal_code.data,
                 country=form.country.data,
-                modified_by=current_user.id,
+                modified_by=user_email,
             )
             db.session.add(address)
             db.session.commit()
 
             warehouse = Warehouse(
-                name=form.name.data, address_id=address.id, contact_id=contact.id, modified_by=current_user.id
+                name=form.name.data, address_id=address.id, contact_id=contact.id, modified_by=user_email
             )
             db.session.add(warehouse)
             db.session.commit()
@@ -258,12 +168,11 @@ def register_routes(app: Flask):
         return render_template("add_warehouse.html", form=form)
 
     @app.route("/warehouse/<int:warehouse_id>/edit", methods=["GET", "POST"])
-    @login_required
     def edit_warehouse(warehouse_id):
+        user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
         warehouse = Warehouse.query.get_or_404(warehouse_id)
         contact = Contact.query.get_or_404(warehouse.contact_id)
         address = Address.query.get_or_404(warehouse.address_id)
-        modified_by = User.query.get_or_404(warehouse.modified_by).email
 
         form = UpdateWarehouseForm(
             name=warehouse.name,
@@ -276,18 +185,24 @@ def register_routes(app: Flask):
             country=address.country,
             created_at=warehouse.created_at,
             updated_at=warehouse.updated_at,
-            modified_by=modified_by,
+            modified_by=warehouse.modified_by,
         )
 
         if form.validate_on_submit():
             warehouse.name = form.name.data
+            warehouse.modified_by = user_email
+
             contact.email = form.email.data
             contact.phone_number = form.phone_number.data
+            contact.modified_by = user_email
+
             address.street_address = form.street_address.data
             address.city = form.city.data
             address.state = form.state.data
             address.postal_code = form.postal_code.data
             address.country = form.country.data
+            address.modified_by = user_email
+
             db.session.commit()
             flash("Warehouse updated successfully!", "success")
             return redirect(url_for("edit_warehouse", warehouse_id=warehouse.id))
@@ -295,16 +210,16 @@ def register_routes(app: Flask):
         return render_template("edit_warehouse.html", form=form, warehouse=warehouse)
 
     @app.route("/warehouse/<int:warehouse_id>/delete", methods=["POST"])
-    @login_required
     def delete_warehouse(warehouse_id):
+        user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
         warehouse = Warehouse.query.get_or_404(warehouse_id)
         warehouse.deleted = True
+        warehouse.modified_by = user_email
         db.session.commit()
         flash("Warehouse deleted successfully!", "success")
         return redirect(url_for("home"))
 
     @app.route("/warehouse/get", methods=["GET"])
-    @login_required
     def get_warehouses():
         query = request.args.get("query", "")
         results = (
@@ -327,8 +242,8 @@ def register_routes(app: Flask):
     # Product
 
     @app.route("/product/add", methods=["GET", "POST"])
-    @login_required
     def add_product():
+        user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
         form = CreateProductForm()
         if form.validate_on_submit():
             product = Product(
@@ -336,7 +251,7 @@ def register_routes(app: Flask):
                 category_label=form.category_label.data,
                 description=form.description.data,
                 quantity_available=0,
-                modified_by=current_user.id,
+                modified_by=user_email,
             )
             db.session.add(product)
             db.session.commit()
@@ -345,10 +260,9 @@ def register_routes(app: Flask):
         return render_template("add_product.html", form=form)
 
     @app.route("/product/<int:product_id>/edit", methods=["GET", "POST"])
-    @login_required
     def edit_product(product_id):
+        user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
         product = Product.query.get_or_404(product_id)
-        modified_by = User.query.get_or_404(product.modified_by).email
 
         form = UpdateProductForm(
             name=product.name,
@@ -357,29 +271,30 @@ def register_routes(app: Flask):
             quantity_available=product.quantity_available,
             created_at=product.created_at,
             updated_at=product.updated_at,
-            modified_by=modified_by,
+            modified_by=product.modified_by,
         )
 
         if form.validate_on_submit():
             product.name = form.name.data
             product.category_label = form.category_label.data
             product.description = form.description.data
+            product.modified_by = user_email
             db.session.commit()
             flash("Product updated successfully!", "success")
             return redirect(url_for("edit_product", product_id=product.id))
         return render_template("edit_product.html", form=form, product=product)
 
     @app.route("/product/<int:product_id>/delete", methods=["POST"])
-    @login_required
     def delete_product(product_id):
+        user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
         product = Product.query.get_or_404(product_id)
         product.deleted = True
+        product.modified_by = user_email
         db.session.commit()
         flash("Product deleted successfully!", "success")
         return redirect(url_for("home"))
 
     @app.route("/product/get", methods=["GET"])
-    @login_required
     def get_products():
         query = request.args.get("query", "")
         results = Product.query.filter(Product.name.ilike(f"%{query}%"), Product.deleted.is_(False)).limit(10).all()
@@ -401,8 +316,8 @@ def register_routes(app: Flask):
     # Order
 
     @app.route("/order/add", methods=["GET", "POST"])
-    @login_required
     def add_order():
+        user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
         form = CreateOrderForm()
         form.product_name.choices = [
             f"{product.name} ({product.id})" for product in Product.query.filter_by(deleted=False).limit(10).all()
@@ -429,7 +344,7 @@ def register_routes(app: Flask):
                 quantity=form.quantity.data,
                 unit_price=form.unit_price.data,
                 currency=form.currency.data,
-                modified_by=current_user.id,
+                modified_by=user_email,
             )
             product = Product.query.get_or_404(order.product_id)
             product.quantity_available += order.quantity
@@ -441,7 +356,6 @@ def register_routes(app: Flask):
         return render_template("add_order.html", form=form)
 
     @app.route("/order/get", methods=["GET"])
-    @login_required
     def get_orders():
         query = request.args.get("query", "")
         results = Order.query.filter(Order.id.ilike(f"%{query}%")).limit(10).all()
@@ -462,7 +376,6 @@ def register_routes(app: Flask):
         return jsonify(orders)
 
     @app.route("/order/<int:order_id>/edit", methods=["GET"])
-    @login_required
     def edit_order(order_id):
         order = Order.query.get_or_404(order_id)
         product = Product.query.get_or_404(order.product_id)
@@ -479,6 +392,6 @@ def register_routes(app: Flask):
             unit_price=order.unit_price,
             currency=order.currency,
             created_at=order.created_at,
-            modified_by=current_user.email,
+            modified_by=order.modified_by,
         )
         return render_template("edit_order.html", form=form, order=order)

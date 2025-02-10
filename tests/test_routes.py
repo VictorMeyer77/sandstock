@@ -1,6 +1,6 @@
 import pytest
 
-from sandstock import User, create_app, db
+from sandstock import create_app, db
 from sandstock.config import TestingConfig
 from sandstock.models import Address, Contact, Order, Partner, Product, Warehouse
 
@@ -11,11 +11,6 @@ def app():
 
     with app.app_context():
         db.create_all()
-
-        default_user = User(username="testuser", email="test@example.com")
-        default_user.set_password("password")
-        db.session.add(default_user)
-        db.session.commit()
 
         yield app
 
@@ -33,67 +28,6 @@ def runner(app):
     return app.test_cli_runner()
 
 
-# Authentication
-
-
-def test_register_with_new_email(client):
-    response = client.post(
-        "/register",
-        data={
-            "username": "newuser",
-            "email": "new@example.com",
-            "password": "password",
-            "confirm_password": "password",
-        },
-        follow_redirects=True,
-    )
-    assert b"Account created successfully!" in response.data
-    user = User.query.filter_by(email="new@example.com").first()
-    assert user is not None
-    assert user.username == "newuser"
-
-
-def test_register_with_existing_email(client):
-    response = client.post(
-        "/register",
-        data={
-            "username": "newuser",
-            "email": "test@example.com",
-            "password": "password",
-            "confirm_password": "password",
-        },
-        follow_redirects=True,
-    )
-    assert b"Email already exists!" in response.data
-
-
-def test_login_with_existing_account(client, app):
-    response = client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
-    assert b"Partners" in response.data
-    assert b"Warehouses" in response.data
-    assert b"Products" in response.data
-    assert b"Orders" in response.data
-
-
-def test_login_with_unknown_account(client, app):
-    response = client.post(
-        "/login", data={"email": "unknonwn@example.com", "password": "password"}, follow_redirects=True
-    )
-    assert b"Invalid email or password!" in response.data
-
-
-def test_logout_authenticated(client, app):
-    client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
-    response = client.get("/logout", follow_redirects=True)
-    assert b"You have been logged out!" in response.data
-    assert response.request.path == "/login"
-
-
-def test_logout(client, app):
-    response = client.get("/logout", follow_redirects=True)
-    assert response.request.path == "/login"
-
-
 def test_home(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
     response = client.get("/", follow_redirects=True)
@@ -102,12 +36,6 @@ def test_home(client, app):
     assert b"Warehouses" in response.data
     assert b"Products" in response.data
     assert b"Orders" in response.data
-
-
-def test_home_unauthenticated(client):
-    response = client.get("/", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
 
 
 def test_add_partner(client, app):
@@ -126,6 +54,7 @@ def test_add_partner(client, app):
             "postal_code": "10001",
             "country": "USA",
         },
+        headers={"X-MS-CLIENT-PRINCIPAL-NAME": "user@mail.com"},
         follow_redirects=True,
     )
 
@@ -133,6 +62,7 @@ def test_add_partner(client, app):
     partner = Partner.query.filter_by(name="Test Partner").first()
     assert partner is not None
     assert partner.contact_person == "John Doe"
+    assert partner.modified_by == "user@mail.com"
     address = Address.query.filter_by(id=partner.address_id).first()
     assert address is not None
     assert address.city == "New York"
@@ -141,27 +71,24 @@ def test_add_partner(client, app):
     assert contact.email == "contact@testpartner.com"
 
 
-def test_add_partner_unauthenticated(client):
-    response = client.get("/partner/add", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
-
-
 # Partner
 
 
 def test_edit_partner(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
-    contact = Contact(email="contact@testpartner.com", phone_number="123456789", modified_by=user_id)
+    contact = Contact(
+        email="contact@testpartner.com",
+        phone_number="123456789",
+        modified_by="test@gmail.com",
+    )
     address = Address(
         street_address="123 Main Street",
         city="New York",
         state="NY",
         postal_code="10001",
         country="USA",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(contact)
@@ -173,7 +100,7 @@ def test_edit_partner(client, app):
         contact_person="John Doe",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     db.session.add(partner)
     db.session.commit()
@@ -194,6 +121,7 @@ def test_edit_partner(client, app):
             "postal_code": "90001",
             "country": "USA",
         },
+        headers={"X-MS-CLIENT-PRINCIPAL-NAME": "user@mail.com"},
         follow_redirects=True,
     )
 
@@ -202,30 +130,24 @@ def test_edit_partner(client, app):
     updated_partner = db.session.get(Partner, partner.id)
     assert updated_partner.name == "Updated Partner Name"
     assert updated_partner.contact_person == "Jane Doe"
+    assert updated_partner.modified_by == "user@mail.com"
     updated_contact = db.session.get(Contact, updated_partner.contact_id)
     assert updated_contact.email == "updated@testpartner.com"
     updated_address = db.session.get(Address, updated_partner.address_id)
     assert updated_address.city == "Los Angeles"
 
 
-def test_edit_partner_unauthenticated(client):
-    response = client.get("/partner/1/edit", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
-
-
 def test_delete_partner(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
-    contact = Contact(email="contact@testpartner.com", phone_number="123456789", modified_by=user_id)
+    contact = Contact(email="contact@testpartner.com", phone_number="123456789", modified_by="test@gmail.com")
     address = Address(
         street_address="123 Main Street",
         city="New York",
         state="NY",
         postal_code="10001",
         country="USA",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(contact)
@@ -237,36 +159,32 @@ def test_delete_partner(client, app):
         contact_person="John Doe",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     db.session.add(partner)
     db.session.commit()
 
-    response = client.post(f"/partner/{partner.id}/delete", follow_redirects=True)
+    response = client.post(
+        f"/partner/{partner.id}/delete", headers={"X-MS-CLIENT-PRINCIPAL-NAME": "user@mail.com"}, follow_redirects=True
+    )
     assert b"Partner deleted successfully!" in response.data
-
+    deleted_partner = db.session.get(Partner, partner.id)
+    assert deleted_partner.modified_by == "user@mail.com"
     deleted_partner = db.session.get(Partner, partner.id)
     assert deleted_partner.deleted is True
-
-
-def test_delete_partner_unauthenticated(client):
-    response = client.post("/partner/1/delete", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
 
 
 def test_get_partners(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
-    contact = Contact(email="contact@testpartner.com", phone_number="123456789", modified_by=user_id)
+    contact = Contact(email="contact@testpartner.com", phone_number="123456789", modified_by="test@gmail.com")
     address = Address(
         street_address="123 Main Street",
         city="New York",
         state="NY",
         postal_code="10001",
         country="USA",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(contact)
@@ -278,21 +196,21 @@ def test_get_partners(client, app):
         contact_person="John Doe",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     partner_b = Partner(
         name="Test Other",
         contact_person="Jane Doe",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     partner_c = Partner(
         name="Test Other",
         contact_person="Jane Doe",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
         deleted=True,
     )
     db.session.add(partner_a)
@@ -310,12 +228,6 @@ def test_get_partners(client, app):
 
     for partner in data:
         assert not partner["deleted"]
-
-
-def test_get_partners_unauthenticated(client):
-    response = client.get("/partner/get", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
 
 
 # Warehouse
@@ -336,6 +248,7 @@ def test_add_warehouse(client, app):
             "postal_code": "10002",
             "country": "Warehouse Country",
         },
+        headers={"X-MS-CLIENT-PRINCIPAL-NAME": "user@mail.com"},
         follow_redirects=True,
     )
 
@@ -344,6 +257,7 @@ def test_add_warehouse(client, app):
     warehouse = Warehouse.query.filter_by(name="Test Warehouse").first()
     assert warehouse is not None
     assert warehouse.name == "Test Warehouse"
+    assert warehouse.modified_by == "user@mail.com"
     contact = Contact.query.filter_by(id=warehouse.contact_id).first()
     assert contact is not None
     assert contact.email == "contact@testwarehouse.com"
@@ -352,24 +266,21 @@ def test_add_warehouse(client, app):
     assert address.city == "Warehouse City"
 
 
-def test_add_warehouse_unauthenticated(client):
-    response = client.get("/warehouse/add", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
-
-
 def test_edit_warehouse(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
-    contact = Contact(email="contact@testwarehouse.com", phone_number="123456789", modified_by=user_id)
+    contact = Contact(
+        email="contact@testwarehouse.com",
+        phone_number="123456789",
+        modified_by="test@gmail.com",
+    )
     address = Address(
         street_address="123 Warehouse Street",
         city="Warehouse City",
         state="WS",
         postal_code="10002",
         country="Warehouse Country",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(contact)
@@ -380,7 +291,7 @@ def test_edit_warehouse(client, app):
         name="Test Warehouse",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     db.session.add(warehouse)
     db.session.commit()
@@ -400,6 +311,7 @@ def test_edit_warehouse(client, app):
             "postal_code": "20002",
             "country": "New Country",
         },
+        headers={"X-MS-CLIENT-PRINCIPAL-NAME": "user@mail.com"},
         follow_redirects=True,
     )
 
@@ -407,30 +319,28 @@ def test_edit_warehouse(client, app):
 
     updated_warehouse = db.session.get(Warehouse, warehouse.id)
     assert updated_warehouse.name == "Updated Warehouse Name"
+    assert updated_warehouse.modified_by == "user@mail.com"
     updated_contact = db.session.get(Contact, updated_warehouse.contact_id)
     assert updated_contact.email == "updated@testwarehouse.com"
     updated_address = db.session.get(Address, updated_warehouse.address_id)
     assert updated_address.city == "New City"
 
 
-def test_edit_warehouse_unauthenticated(client):
-    response = client.get("/warehouse/1/edit", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
-
-
 def test_delete_warehouse(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
-    contact = Contact(email="contact@testwarehouse.com", phone_number="123456789", modified_by=user_id)
+    contact = Contact(
+        email="contact@testwarehouse.com",
+        phone_number="123456789",
+        modified_by="test@gmail.com",
+    )
     address = Address(
         street_address="123 Warehouse Street",
         city="Warehouse City",
         state="WS",
         postal_code="10002",
         country="Warehouse Country",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(contact)
@@ -441,35 +351,37 @@ def test_delete_warehouse(client, app):
         name="Test Warehouse",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     db.session.add(warehouse)
     db.session.commit()
 
-    response = client.post(f"/warehouse/{warehouse.id}/delete", follow_redirects=True)
+    response = client.post(
+        f"/warehouse/{warehouse.id}/delete",
+        headers={"X-MS-CLIENT-PRINCIPAL-NAME": "user@mail.com"},
+        follow_redirects=True,
+    )
     assert b"Warehouse deleted successfully!" in response.data
     deleted_warehouse = db.session.get(Warehouse, warehouse.id)
     assert deleted_warehouse.deleted is True
-
-
-def test_delete_warehouse_unauthenticated(client):
-    response = client.post("/warehouse/1/delete", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
+    assert deleted_warehouse.modified_by == "user@mail.com"
 
 
 def test_get_warehouses(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
-    contact = Contact(email="contact@testwarehouse.com", phone_number="123456789", modified_by=user_id)
+    contact = Contact(
+        email="contact@testwarehouse.com",
+        phone_number="123456789",
+        modified_by="test@gmail.com",
+    )
     address = Address(
         street_address="123 Warehouse Street",
         city="Warehouse City",
         state="WS",
         postal_code="10002",
         country="Warehouse Country",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(contact)
@@ -480,19 +392,19 @@ def test_get_warehouses(client, app):
         name="Test Warehouse",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     warehouse_b = Warehouse(
         name="Test Other Warehouse",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     warehouse_c = Warehouse(
         name="Deleted Warehouse",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
         deleted=True,
     )
     db.session.add(warehouse_a)
@@ -510,12 +422,6 @@ def test_get_warehouses(client, app):
         assert not warehouse["deleted"]
 
 
-def test_get_warehouses_unauthenticated(client):
-    response = client.get("/warehouse/get", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
-
-
 # Product
 
 
@@ -525,6 +431,7 @@ def test_add_product(client, app):
     response = client.post(
         "/product/add",
         data={"name": "Test Product", "category_label": "Test Category", "description": "This is a test product."},
+        headers={"X-MS-CLIENT-PRINCIPAL-NAME": "user@mail.com"},
         follow_redirects=True,
     )
 
@@ -535,24 +442,18 @@ def test_add_product(client, app):
     assert product.name == "Test Product"
     assert product.category_label == "Test Category"
     assert product.description == "This is a test product."
-
-
-def test_add_product_unauthenticated(client):
-    response = client.get("/product/add", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
+    assert product.modified_by == "user@mail.com"
 
 
 def test_edit_product(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
     product = Product(
         name="Test Product",
         category_label="Test Category",
         description="This is a test product.",
         quantity_available=0,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     db.session.add(product)
     db.session.commit()
@@ -568,6 +469,7 @@ def test_edit_product(client, app):
             "description": "This is an updated product.",
             "quantity_available": 10,
         },
+        headers={"X-MS-CLIENT-PRINCIPAL-NAME": "user@mail.com"},
         follow_redirects=True,
     )
 
@@ -578,65 +480,55 @@ def test_edit_product(client, app):
     assert updated_product.category_label == "Updated Category"
     assert updated_product.description == "This is an updated product."
     assert updated_product.quantity_available == 0
-
-
-def test_edit_product_unauthenticated(client):
-    response = client.get("/product/1/edit", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
+    assert updated_product.modified_by == "user@mail.com"
 
 
 def test_delete_product(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
     product = Product(
         name="Test Product",
         category_label="Test Category",
         description="This is a test product.",
         quantity_available=0,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     db.session.add(product)
     db.session.commit()
 
-    response = client.post(f"/product/{product.id}/delete", follow_redirects=True)
+    response = client.post(
+        f"/product/{product.id}/delete", headers={"X-MS-CLIENT-PRINCIPAL-NAME": "user@mail.com"}, follow_redirects=True
+    )
     assert b"Product deleted successfully!" in response.data
 
     deleted_product = db.session.get(Product, product.id)
     assert deleted_product.deleted is True
-
-
-def test_delete_product_unauthenticated(client):
-    response = client.post("/product/1/delete", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
+    assert deleted_product.modified_by == "user@mail.com"
 
 
 def test_get_products(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
     product_a = Product(
         name="Test Product",
         category_label="Test Category",
         description="This is a test product.",
         quantity_available=0,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     product_b = Product(
         name="Test Other Product",
         category_label="Other Category",
         description="This is another test product.",
         quantity_available=0,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     product_c = Product(
         name="Deleted Product",
         category_label="Deleted Category",
         description="This is a deleted product.",
         quantity_available=0,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
         deleted=True,
     )
     db.session.add(product_a)
@@ -656,27 +548,24 @@ def test_get_products(client, app):
         assert not product["deleted"]
 
 
-def test_get_products_unauthenticated(client):
-    response = client.get("/product/get", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
-
-
 # Order
 
 
 def test_add_order(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
-    contact = Contact(email="contact@testpartner.com", phone_number="123456789", modified_by=user_id)
+    contact = Contact(
+        email="contact@testpartner.com",
+        phone_number="123456789",
+        modified_by="test@gmail.com",
+    )
     address = Address(
         street_address="123 Main Street",
         city="New York",
         state="NY",
         postal_code="10001",
         country="USA",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(contact)
@@ -688,20 +577,20 @@ def test_add_order(client, app):
         category_label="Test Category",
         description="This is a test product.",
         quantity_available=0,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     partner = Partner(
         name="Test Partner",
         contact_person="John Doe",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     warehouse = Warehouse(
         name="Test Warehouse",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(product)
@@ -720,6 +609,7 @@ def test_add_order(client, app):
             "unit_price": 10.0,
             "currency": "USD",
         },
+        headers={"X-MS-CLIENT-PRINCIPAL-NAME": "user@mail.com"},
         follow_redirects=True,
     )
 
@@ -732,28 +622,26 @@ def test_add_order(client, app):
     assert order.quantity == 5
     assert order.unit_price == 10.0
     assert order.currency == "USD"
+    assert order.modified_by == "user@mail.com"
     product = Product.query.first()
     assert product.quantity_available == 5
-
-
-def test_add_order_unauthenticated(client):
-    response = client.get("/order/add", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
 
 
 def test_edit_order(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
-    contact = Contact(email="contact@testpartner.com", phone_number="123456789", modified_by=user_id)
+    contact = Contact(
+        email="contact@testpartner.com",
+        phone_number="123456789",
+        modified_by="test@gmail.com",
+    )
     address = Address(
         street_address="123 Main Street",
         city="New York",
         state="NY",
         postal_code="10001",
         country="USA",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(contact)
@@ -765,20 +653,20 @@ def test_edit_order(client, app):
         category_label="Test Category",
         description="This is a test product.",
         quantity_available=0,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     partner = Partner(
         name="Test Partner",
         contact_person="John Doe",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     warehouse = Warehouse(
         name="Test Warehouse",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(product)
@@ -794,7 +682,7 @@ def test_edit_order(client, app):
         quantity=5,
         unit_price=10.0,
         currency="USD",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     db.session.add(order)
     db.session.commit()
@@ -806,24 +694,21 @@ def test_edit_order(client, app):
     assert b"10.0" in response.data
 
 
-def test_edit_order_unauthenticated(client):
-    response = client.get("/order/1/edit", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data
-
-
 def test_get_orders(client, app):
     client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
 
-    user_id = User.query.filter_by(email="test@example.com").first().id
-    contact = Contact(email="contact@testpartner.com", phone_number="123456789", modified_by=user_id)
+    contact = Contact(
+        email="contact@testpartner.com",
+        phone_number="123456789",
+        modified_by="test@gmail.com",
+    )
     address = Address(
         street_address="123 Main Street",
         city="New York",
         state="NY",
         postal_code="10001",
         country="USA",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(contact)
@@ -835,20 +720,20 @@ def test_get_orders(client, app):
         category_label="Test Category",
         description="This is a test product.",
         quantity_available=0,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     partner = Partner(
         name="Test Partner",
         contact_person="John Doe",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     warehouse = Warehouse(
         name="Test Warehouse",
         contact_id=Contact.query.first().id,
         address_id=Address.query.first().id,
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(product)
@@ -864,7 +749,7 @@ def test_get_orders(client, app):
         quantity=5,
         unit_price=10.0,
         currency="USD",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
     order_b = Order(
         category="Other Category",
@@ -874,7 +759,7 @@ def test_get_orders(client, app):
         quantity=10,
         unit_price=20.0,
         currency="EUR",
-        modified_by=user_id,
+        modified_by="test@gmail.com",
     )
 
     db.session.add(order_a)
@@ -887,9 +772,3 @@ def test_get_orders(client, app):
     assert len(data) == 2
     assert data[0]["category"] == "Test Category"
     assert data[1]["category"] == "Other Category"
-
-
-def test_get_orders_unauthenticated(client):
-    response = client.get("/order/get", follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Login" in response.data

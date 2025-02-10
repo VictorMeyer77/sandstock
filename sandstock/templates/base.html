@@ -16,16 +16,6 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="ms-auto d-flex align-items-center">
-                    {% if current_user.is_authenticated %}
-                        <a class="btn btn-danger" href="{{ url_for('logout') }}">Logout</a>
-                    {% else %}
-                        <a class="btn btn-success" href="{{ url_for('login') }}">Login</a>
-                        <a class="btn btn-secondary" href="{{ url_for('register') }}">Register</a>
-                    {% endif %}
-                </div>
-            </div>
         </div>
     </nav>
     <div class="container mt-4">
