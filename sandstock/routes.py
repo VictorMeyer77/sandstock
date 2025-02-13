@@ -29,10 +29,10 @@ def register_routes(app: Flask):
 
     @app.route("/")
     def home():
-        orders = Order.query.filter_by().limit(10).all()
-        partners = Partner.query.filter_by(deleted=False).limit(10).all()
-        warehouses = Warehouse.query.filter_by(deleted=False).limit(10).all()
-        products = Product.query.filter_by(deleted=False).limit(10).all()
+        orders = db.session.query(Order).limit(10).all()
+        partners = db.session.query(Partner).filter_by(deleted=False).limit(10).all()
+        warehouses = db.session.query(Warehouse).filter_by(deleted=False).limit(10).all()
+        products = db.session.query(Product).filter_by(deleted=False).limit(10).all()
         return render_template("home.html", partners=partners, warehouses=warehouses, products=products, orders=orders)
 
     # Partner
@@ -74,9 +74,14 @@ def register_routes(app: Flask):
     @app.route("/partner/<int:partner_id>/edit", methods=["GET", "POST"])
     def edit_partner(partner_id):
         user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
-        partner = Partner.query.get_or_404(partner_id)
-        contact = Contact.query.get_or_404(partner.contact_id)
-        address = Address.query.get_or_404(partner.address_id)
+
+        partner = db.session.get(Partner, partner_id)
+        if not partner:
+            flash("Partner not found!", "error")
+            return redirect(url_for("home"))
+
+        contact = db.session.get(Contact, partner.contact_id)
+        address = db.session.get(Address, partner.address_id)
 
         form = UpdatePartnerForm(
             name=partner.name,
@@ -118,7 +123,12 @@ def register_routes(app: Flask):
     @app.route("/partner/<int:partner_id>/delete", methods=["POST"])
     def delete_partner(partner_id):
         user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
-        partner = Partner.query.get_or_404(partner_id)
+
+        partner = db.session.get(Partner, partner_id)
+        if not partner:
+            flash("Partner not found!", "error")
+            return redirect(url_for("home"))
+
         partner.deleted = True
         partner.modified_by = user_email
         db.session.commit()
@@ -128,7 +138,13 @@ def register_routes(app: Flask):
     @app.route("/partner/get", methods=["GET"])
     def get_partners():
         query = request.args.get("query", "")
-        results = Partner.query.filter(Partner.name.ilike(f"%{query}%"), Partner.deleted.is_(False)).limit(10).all()
+
+        results = (
+            db.session.query(Partner)
+            .filter(Partner.name.ilike(f"%{query}%"), Partner.deleted.is_(False))
+            .limit(10)
+            .all()
+        )
         partners = [
             {
                 "id": partner.id,
@@ -180,9 +196,14 @@ def register_routes(app: Flask):
     @app.route("/warehouse/<int:warehouse_id>/edit", methods=["GET", "POST"])
     def edit_warehouse(warehouse_id):
         user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
-        warehouse = Warehouse.query.get_or_404(warehouse_id)
-        contact = Contact.query.get_or_404(warehouse.contact_id)
-        address = Address.query.get_or_404(warehouse.address_id)
+
+        warehouse = db.session.get(Warehouse, warehouse_id)
+        if not warehouse:
+            flash("Warehouse not found!", "error")
+            return redirect(url_for("home"))
+
+        contact = db.session.get(Contact, warehouse.contact_id)
+        address = db.session.get(Address, warehouse.address_id)
 
         form = UpdateWarehouseForm(
             name=warehouse.name,
@@ -222,7 +243,12 @@ def register_routes(app: Flask):
     @app.route("/warehouse/<int:warehouse_id>/delete", methods=["POST"])
     def delete_warehouse(warehouse_id):
         user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
-        warehouse = Warehouse.query.get_or_404(warehouse_id)
+
+        warehouse = db.session.get(Warehouse, warehouse_id)
+        if not warehouse:
+            flash("Warehouse not found!", "error")
+            return redirect(url_for("home"))
+
         warehouse.deleted = True
         warehouse.modified_by = user_email
         db.session.commit()
@@ -233,7 +259,10 @@ def register_routes(app: Flask):
     def get_warehouses():
         query = request.args.get("query", "")
         results = (
-            Warehouse.query.filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted.is_(False)).limit(10).all()
+            db.session.query(Warehouse)
+            .filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted.is_(False))
+            .limit(10)
+            .all()
         )
         warehouses = [
             {
@@ -272,7 +301,11 @@ def register_routes(app: Flask):
     @app.route("/product/<int:product_id>/edit", methods=["GET", "POST"])
     def edit_product(product_id):
         user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
-        product = Product.query.get_or_404(product_id)
+
+        product = db.session.get(Product, product_id)
+        if not product:
+            flash("Product not found!", "error")
+            return redirect(url_for("home"))
 
         form = UpdateProductForm(
             name=product.name,
@@ -297,7 +330,12 @@ def register_routes(app: Flask):
     @app.route("/product/<int:product_id>/delete", methods=["POST"])
     def delete_product(product_id):
         user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
-        product = Product.query.get_or_404(product_id)
+
+        product = db.session.get(Product, product_id)
+        if not product:
+            flash("Product not found!", "error")
+            return redirect(url_for("home"))
+
         product.deleted = True
         product.modified_by = user_email
         db.session.commit()
@@ -307,7 +345,13 @@ def register_routes(app: Flask):
     @app.route("/product/get", methods=["GET"])
     def get_products():
         query = request.args.get("query", "")
-        results = Product.query.filter(Product.name.ilike(f"%{query}%"), Product.deleted.is_(False)).limit(10).all()
+
+        results = (
+            db.session.query(Product)
+            .filter(Product.name.ilike(f"%{query}%"), Product.deleted.is_(False))
+            .limit(10)
+            .all()
+        )
         products = [
             {
                 "id": product.id,
@@ -330,14 +374,16 @@ def register_routes(app: Flask):
         user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME", "unknown")
         form = CreateOrderForm()
         form.product_name.choices = [
-            f"{product.name} ({product.id})" for product in Product.query.filter_by(deleted=False).limit(10).all()
+            f"{product.name} ({product.id})"
+            for product in db.session.query(Product).filter_by(deleted=False).limit(10).all()
         ]
         form.partner_name.choices = [
-            f"{partner.name} ({partner.id})" for partner in Partner.query.filter_by(deleted=False).limit(10).all()
+            f"{partner.name} ({partner.id})"
+            for partner in db.session.query(Partner).filter_by(deleted=False).limit(10).all()
         ]
         form.warehouse_name.choices = [
             f"{warehouse.name} ({warehouse.id})"
-            for warehouse in Warehouse.query.filter_by(deleted=False).limit(10).all()
+            for warehouse in db.session.query(Warehouse).filter_by(deleted=False).limit(10).all()
         ]
 
         if form.validate_on_submit():
@@ -356,7 +402,7 @@ def register_routes(app: Flask):
                 currency=form.currency.data,
                 modified_by=user_email,
             )
-            product = Product.query.get_or_404(order.product_id)
+            product = db.session.get(Product, order.product_id)
             product.quantity_available += order.quantity
             db.session.add(order)
             db.session.commit()
@@ -368,7 +414,7 @@ def register_routes(app: Flask):
     @app.route("/order/get", methods=["GET"])
     def get_orders():
         query = request.args.get("query", "")
-        results = Order.query.filter(Order.id.ilike(f"%{query}%")).limit(10).all()
+        results = db.session.query(Order).filter(Order.id.ilike(f"%{query}%")).limit(10).all()
         orders = [
             {
                 "id": order.id,
@@ -387,10 +433,15 @@ def register_routes(app: Flask):
 
     @app.route("/order/<int:order_id>/edit", methods=["GET"])
     def edit_order(order_id):
-        order = Order.query.get_or_404(order_id)
-        product = Product.query.get_or_404(order.product_id)
-        partner = Partner.query.get_or_404(order.partner_id)
-        warehouse = Warehouse.query.get_or_404(order.warehouse_id)
+
+        order = db.session.get(Order, order_id)
+        if not order:
+            flash("Order not found!", "error")
+            return redirect(url_for("home"))
+
+        product = db.session.get(Product, order.product_id)
+        partner = db.session.get(Partner, order.partner_id)
+        warehouse = db.session.get(Warehouse, order.warehouse_id)
 
         form = UpdateOrderForm(
             id=order.id,
