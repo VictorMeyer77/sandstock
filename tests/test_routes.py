@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 import pytest
 
 from sandstock import create_app, db
@@ -26,6 +28,18 @@ def client(app):
 @pytest.fixture
 def runner(app):
     return app.test_cli_runner()
+
+
+def test_logout(client):
+    headers = {"X-MS-CLIENT-PRINCIPAL-ID": "test-client-id"}
+    response = client.get("/logout", headers=headers)
+    assert response.status_code == 302
+    params = {
+        "post_logout_redirect_uri": TestingConfig.POST_LOGOUT_URL,
+        "client_id": "test-client-id",
+    }
+    expected_url = f"{TestingConfig.LOGOUT_URL}?{urlencode(params)}"
+    assert response.headers["Location"] == expected_url
 
 
 def test_home(client, app):

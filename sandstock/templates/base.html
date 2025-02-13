@@ -16,6 +16,11 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto d-flex align-items-center">
+                    <a class="btn btn-danger" href="{{ url_for('logout') }}">Logout</a>
+                </div>
+            </div>
         </div>
     </nav>
     <div class="container mt-4">

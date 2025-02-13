@@ -1,7 +1,9 @@
 import re
+from urllib.parse import urlencode
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 
+from sandstock import Config
 from sandstock.forms import (
     CreateOrderForm,
     CreatePartnerForm,
@@ -16,6 +18,14 @@ from sandstock.models import Address, Contact, Order, Partner, Product, Warehous
 
 
 def register_routes(app: Flask):
+
+    @app.route("/logout")
+    def logout():
+        params = {
+            "post_logout_redirect_uri": Config.POST_LOGOUT_URL,
+            "client_id": request.headers.get("X-MS-CLIENT-PRINCIPAL-ID", "unknown"),
+        }
+        return redirect(f"{Config.LOGOUT_URL}?{urlencode(params)}")
 
     @app.route("/")
     def home():
