@@ -39,7 +39,11 @@ lint:             ## Run pep8, black, mypy linters.
 
 .PHONY: test
 test: lint        ## Run tests and generate coverage report.
+	@docker run --name postgres-test -e POSTGRES_PASSWORD=test -e POSTGRES_USER=test -e POSTGRES_DB=test_erp -p 5432:5432 -d postgres
+	@sleep 2
 	$(ENV_PREFIX)pytest -v --cov-config .coveragerc --cov=sandstock -l --tb=short --maxfail=1 -p no:logging tests/
+	@docker stop postgres-test
+	@docker rm postgres-test
 	@PYTEST_EXIT_CODE=$$?
 	$(ENV_PREFIX)coverage xml
 	$(ENV_PREFIX)coverage html

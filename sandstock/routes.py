@@ -2,6 +2,7 @@ import re
 from urllib.parse import urlencode
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
+from sqlalchemy import String, cast
 
 from sandstock import Config
 from sandstock.forms import (
@@ -414,7 +415,7 @@ def register_routes(app: Flask):
     @app.route("/order/get", methods=["GET"])
     def get_orders():
         query = request.args.get("query", "")
-        results = db.session.query(Order).filter(Order.id.ilike(f"%{query}%")).limit(10).all()
+        results = db.session.query(Order).filter(cast(Order.id, String).ilike(f"%{query}%")).limit(10).all()
         orders = [
             {
                 "id": order.id,

@@ -244,6 +244,58 @@ def test_get_partners(client, app):
         assert not partner["deleted"]
 
 
+def test_get_partners_with_filter(client, app):
+    client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
+
+    contact = Contact(email="contact@testpartner.com", phone_number="123456789", modified_by="test@gmail.com")
+    address = Address(
+        street_address="123 Main Street",
+        city="New York",
+        state="NY",
+        postal_code="10001",
+        country="USA",
+        modified_by="test@gmail.com",
+    )
+
+    db.session.add(contact)
+    db.session.add(address)
+    db.session.commit()
+
+    partner_a = Partner(
+        name="Test Partner",
+        contact_person="John Doe",
+        contact_id=Contact.query.first().id,
+        address_id=Address.query.first().id,
+        modified_by="test@gmail.com",
+    )
+    partner_b = Partner(
+        name="Test Other",
+        contact_person="Jane Doe",
+        contact_id=Contact.query.first().id,
+        address_id=Address.query.first().id,
+        modified_by="test@gmail.com",
+    )
+    partner_c = Partner(
+        name="Test Other",
+        contact_person="Jane Doe",
+        contact_id=Contact.query.first().id,
+        address_id=Address.query.first().id,
+        modified_by="test@gmail.com",
+        deleted=True,
+    )
+    db.session.add(partner_a)
+    db.session.add(partner_b)
+    db.session.add(partner_c)
+    db.session.commit()
+
+    response = client.get("/partner/get?query=Other", follow_redirects=True)
+    assert response.status_code == 200
+    data = response.get_json()
+
+    assert len(data) == 1
+    assert data[0]["name"] == "Test Other"
+
+
 # Warehouse
 
 
@@ -436,6 +488,58 @@ def test_get_warehouses(client, app):
         assert not warehouse["deleted"]
 
 
+def test_get_warehouses_with_filter(client, app):
+    client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
+
+    contact = Contact(
+        email="contact@testwarehouse.com",
+        phone_number="123456789",
+        modified_by="test@gmail.com",
+    )
+    address = Address(
+        street_address="123 Warehouse Street",
+        city="Warehouse City",
+        state="WS",
+        postal_code="10002",
+        country="Warehouse Country",
+        modified_by="test@gmail.com",
+    )
+
+    db.session.add(contact)
+    db.session.add(address)
+    db.session.commit()
+
+    warehouse_a = Warehouse(
+        name="Test Warehouse",
+        contact_id=Contact.query.first().id,
+        address_id=Address.query.first().id,
+        modified_by="test@gmail.com",
+    )
+    warehouse_b = Warehouse(
+        name="Test Other Warehouse",
+        contact_id=Contact.query.first().id,
+        address_id=Address.query.first().id,
+        modified_by="test@gmail.com",
+    )
+    warehouse_c = Warehouse(
+        name="Deleted Warehouse",
+        contact_id=Contact.query.first().id,
+        address_id=Address.query.first().id,
+        modified_by="test@gmail.com",
+        deleted=True,
+    )
+    db.session.add(warehouse_a)
+    db.session.add(warehouse_b)
+    db.session.add(warehouse_c)
+    db.session.commit()
+
+    response = client.get("/warehouse/get?query=Other", follow_redirects=True)
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 1
+    assert data[0]["name"] == "Test Other Warehouse"
+
+
 # Product
 
 
@@ -560,6 +664,43 @@ def test_get_products(client, app):
 
     for product in data:
         assert not product["deleted"]
+
+
+def test_get_products_with_filter(client, app):
+    client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
+
+    product_a = Product(
+        name="Test Product",
+        category_label="Test Category",
+        description="This is a test product.",
+        quantity_available=0,
+        modified_by="test@gmail.com",
+    )
+    product_b = Product(
+        name="Test Other Product",
+        category_label="Other Category",
+        description="This is another test product.",
+        quantity_available=0,
+        modified_by="test@gmail.com",
+    )
+    product_c = Product(
+        name="Deleted Product",
+        category_label="Deleted Category",
+        description="This is a deleted product.",
+        quantity_available=0,
+        modified_by="test@gmail.com",
+        deleted=True,
+    )
+    db.session.add(product_a)
+    db.session.add(product_b)
+    db.session.add(product_c)
+    db.session.commit()
+
+    response = client.get("/product/get?query=Other", follow_redirects=True)
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 1
+    assert data[0]["name"] == "Test Other Product"
 
 
 # Order
@@ -786,3 +927,82 @@ def test_get_orders(client, app):
     assert len(data) == 2
     assert data[0]["category"] == "Test Category"
     assert data[1]["category"] == "Other Category"
+
+
+def test_get_orders_with_filter(client, app):
+    client.post("/login", data={"email": "test@example.com", "password": "password"}, follow_redirects=True)
+
+    contact = Contact(
+        email="contact@testpartner.com",
+        phone_number="123456789",
+        modified_by="test@gmail.com",
+    )
+    address = Address(
+        street_address="123 Main Street",
+        city="New York",
+        state="NY",
+        postal_code="10001",
+        country="USA",
+        modified_by="test@gmail.com",
+    )
+
+    db.session.add(contact)
+    db.session.add(address)
+    db.session.commit()
+
+    product = Product(
+        name="Test Product",
+        category_label="Test Category",
+        description="This is a test product.",
+        quantity_available=0,
+        modified_by="test@gmail.com",
+    )
+    partner = Partner(
+        name="Test Partner",
+        contact_person="John Doe",
+        contact_id=Contact.query.first().id,
+        address_id=Address.query.first().id,
+        modified_by="test@gmail.com",
+    )
+    warehouse = Warehouse(
+        name="Test Warehouse",
+        contact_id=Contact.query.first().id,
+        address_id=Address.query.first().id,
+        modified_by="test@gmail.com",
+    )
+
+    db.session.add(product)
+    db.session.add(partner)
+    db.session.add(warehouse)
+    db.session.commit()
+
+    order_a = Order(
+        category="Test Category",
+        product_id=product.id,
+        partner_id=partner.id,
+        warehouse_id=warehouse.id,
+        quantity=5,
+        unit_price=10.0,
+        currency="USD",
+        modified_by="test@gmail.com",
+    )
+    order_b = Order(
+        category="Other Category",
+        product_id=product.id,
+        partner_id=partner.id,
+        warehouse_id=warehouse.id,
+        quantity=10,
+        unit_price=20.0,
+        currency="EUR",
+        modified_by="test@gmail.com",
+    )
+
+    db.session.add(order_a)
+    db.session.add(order_b)
+    db.session.commit()
+
+    response = client.get("/order/get?query=1", follow_redirects=True)
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 1
+    assert data[0]["category"] == "Test Category"
