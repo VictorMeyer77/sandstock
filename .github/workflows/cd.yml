@@ -1,6 +1,8 @@
-name: Deploy On Azure Web App
+name: CD
 
-on: [push]
+on:
+  push:
+    [ "main" ]
 
 jobs:
   deploy:
