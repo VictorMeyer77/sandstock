@@ -12,8 +12,8 @@ jobs:
 
       - name: Replace token in config
         run: |
-          sed -i "s/{{ENV}}/${{ vars.environment }}/g" sandstock/config.py
-          sed -i "s/{{PROJECT}}/${{ vars.project }}/g" sandstock/config.py
+          sed -i "s/{{ENV}}/${{ vars.ENV }}/g" sandstock/config.py
+          sed -i "s/{{PROJECT}}/${{ vars.PROJECT }}/g" sandstock/config.py
           sed -i "s/{{TENANT_ID}}/${{ secrets.AZURE_TENANT_ID }}/g" sandstock/config.py
           sed -i "s/{{SQL_DB_ADMIN_PASSWORD}}/${{ secrets.SQL_DB_ADMIN_PASSWORD }}/g" sandstock/config.py
 
