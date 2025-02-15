@@ -3,15 +3,14 @@ import os
 
 class Config:
     SQLALCHEMY_DATABASE_URI = (
-        f"postgresql+psycopg2://"
-        f"{os.getenv('ENV')}-{os.getenv('PROJECT')}-sql.postgres.database.azure.com:5432/"
-        f"{os.getenv('ENV')}_erp?user=psql_admin&password={os.getenv('SQL_DB_ADMIN_PASSWORD')}"
-        f"&sslmode=require"
+        "postgresql+psycopg2://{{ENV}}-{{PROJECT}}-sql.postgres.database.azure.com:5432/"
+        "{{ENV}}_erp?user=psql_admin&password={{SQL_DB_ADMIN_PASSWORD}}"
+        "&sslmode=require"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.urandom(32)
-    LOGOUT_URL = f"https://login.microsoftonline.com/{os.getenv('TENANT_ID')}/oauth2/v2.0/logout"
-    POST_LOGOUT_URL = f"https://{os.getenv('ENV')}-{os.getenv('PROJECT')}.azurewebsites.net/logout"
+    LOGOUT_URL = "https://login.microsoftonline.com/{{TENANT_ID}}/oauth2/v2.0/logout"
+    POST_LOGOUT_URL = "https://{{ENV}}-{{PROJECT}}.azurewebsites.net/logout"
     DEBUG = False
 
 
