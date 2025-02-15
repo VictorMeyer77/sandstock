@@ -10,11 +10,11 @@ jobs:
       - name: Azure login
         uses: azure/login@v2
         with:
-          creds: '{"clientId":"${{ secrets.DEPLOY_CLIENT_ID }}","clientSecret":"${{ secrets.DEPLOY_CLIENT_SECRET }}","subscriptionId":"${{ secrets.SUBSCRIPTION_ID }}","tenantId":"${{ secrets.TENANT_ID }}"}'
+          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
 
       - name: Azure CLI script
         uses: azure/cli@v2
         with:
           azcliversion: latest
           inlineScript: |
-            az webapp up --name dev-sandstock-wap-erp  --runtime PYTHON:${{ vars.DEPLOY_CLIENT_SECRET }}
+            az webapp up --name ${{ vars.ENV }}-${{ vars.PROJECT }}-wap-erp --runtime PYTHON:${{ vars.DEPLOY_CLIENT_SECRET }}
