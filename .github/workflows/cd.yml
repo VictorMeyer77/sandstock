@@ -1,0 +1,22 @@
+name: Deploy On Azure Web App
+
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.DEPLOY_CLIENT_ID }}
+          client-secret: ${{ secrets.DEPLOY_CLIENT_SECRET }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+
+      - name: Azure CLI script
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az webapp up --name dev-sandstock-wap-erp  --runtime PYTHON:${{ vars.DEPLOY_CLIENT_SECRET }}
