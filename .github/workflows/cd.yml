@@ -14,6 +14,11 @@ jobs:
 
       - name: Azure CLI script
         uses: azure/cli@v2
+        env:
+          ENV: ${{ vars.environment }}
+          PROJECT: ${{ vars.project }}
+          TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          SQL_DB_ADMIN_PASSWORD: ${{ secrets.SQL_DB_ADMIN_PASSWORD }}
         with:
           azcliversion: latest
           inlineScript: |
