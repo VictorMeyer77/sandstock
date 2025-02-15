@@ -17,4 +17,4 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az webapp up --name ${{ vars.ENV }}-${{ vars.PROJECT }}-wap-erp --runtime PYTHON:${{ vars.DEPLOY_CLIENT_SECRET }}
+            az webapp up --name ${{ vars.ENV }}-${{ vars.PROJECT }}-wap-erp --runtime PYTHON:${{ vars.PYTHON_VERSION }}
