@@ -39,11 +39,11 @@ lint:             ## Run pep8, black, mypy linters.
 
 .PHONY: test
 test: lint        ## Run tests and generate coverage report.
-	@docker run --name postgres-test -e POSTGRES_PASSWORD=test -e POSTGRES_USER=test -e POSTGRES_DB=test_erp -p 5432:5432 -d postgres
-	@sleep 2
+	@docker run -d --name azure-sql-edge -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Te54?ko1" -e "MSSQL_PID=Developer" -p 57000:1433 --restart always  mcr.microsoft.com/azure-sql-edge:latest
+	@sleep 5
 	$(ENV_PREFIX)pytest -v --cov-config .coveragerc --cov=sandstock -l --tb=short --maxfail=1 -p no:logging tests/
-	@docker stop postgres-test
-	@docker rm postgres-test
+	@docker stop azure-sql-edge
+	@docker rm azure-sql-edge
 	@PYTEST_EXIT_CODE=$$?
 	$(ENV_PREFIX)coverage xml
 	$(ENV_PREFIX)coverage html

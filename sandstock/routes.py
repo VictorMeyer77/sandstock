@@ -142,7 +142,7 @@ def register_routes(app: Flask):
 
         results = (
             db.session.query(Partner)
-            .filter(Partner.name.ilike(f"%{query}%"), Partner.deleted.is_(False))
+            .filter(Partner.name.ilike(f"%{query}%"), Partner.deleted == False)  # type: ignore # noqa: E712
             .limit(10)
             .all()
         )
@@ -261,7 +261,7 @@ def register_routes(app: Flask):
         query = request.args.get("query", "")
         results = (
             db.session.query(Warehouse)
-            .filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted.is_(False))
+            .filter(Warehouse.name.ilike(f"%{query}%"), Warehouse.deleted == False)  # type: ignore # noqa: E712
             .limit(10)
             .all()
         )
@@ -349,7 +349,7 @@ def register_routes(app: Flask):
 
         results = (
             db.session.query(Product)
-            .filter(Product.name.ilike(f"%{query}%"), Product.deleted.is_(False))
+            .filter(Product.name.ilike(f"%{query}%"), Product.deleted == False)  # type: ignore # noqa: E712
             .limit(10)
             .all()
         )

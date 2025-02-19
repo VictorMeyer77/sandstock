@@ -26,9 +26,9 @@ class Address(db.Model):  # type: ignore
     state = db.Column(db.String(500), nullable=False)
     postal_code = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(200), nullable=False)
-    created_at = db.Column(db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = db.Column(
-        db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
+        db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
     )
     modified_by = db.Column(db.String(254), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
@@ -42,9 +42,9 @@ class Partner(db.Model):  # type: ignore
     contact_person = db.Column(db.String(200), nullable=True)
     address_id = db.Column(db.Integer, db.ForeignKey("dim_address.id"), nullable=False)
     contact_id = db.Column(db.Integer, db.ForeignKey("dim_contact.id"), nullable=False)
-    created_at = db.Column(db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = db.Column(
-        db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
+        db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
     )
     modified_by = db.Column(db.String(254), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
@@ -57,9 +57,9 @@ class Warehouse(db.Model):  # type: ignore
     name = db.Column(db.String(200), nullable=False)
     address_id = db.Column(db.Integer, db.ForeignKey("dim_address.id"), nullable=False)
     contact_id = db.Column(db.Integer, db.ForeignKey("dim_contact.id"), nullable=False)
-    created_at = db.Column(db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = db.Column(
-        db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
+        db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
     )
     modified_by = db.Column(db.String(254), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
@@ -73,9 +73,9 @@ class Product(db.Model):  # type: ignore
     category_label = db.Column(db.String(200), nullable=False)
     description = db.Column(db.String(500), nullable=False)
     quantity_available = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = db.Column(
-        db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
+        db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow, nullable=False
     )
     modified_by = db.Column(db.String(254), nullable=False)
     deleted = db.Column(db.Boolean, default=False, nullable=False)
@@ -92,5 +92,5 @@ class Order(db.Model):  # type: ignore
     quantity = db.Column(db.Integer, nullable=False)
     unit_price = db.Column(db.Float, nullable=False)
     currency = db.Column(db.String(3), nullable=False)
-    created_at = db.Column(db.TIMESTAMP, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     modified_by = db.Column(db.String(254), nullable=False)
