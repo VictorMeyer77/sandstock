@@ -3,7 +3,7 @@ import os
 
 class Config:
     SQLALCHEMY_DATABASE_URI = (
-        "mssql+pyodbc://sql_admin:{{SQL_DB_ADMIN_PASSWORD}}@{{ENV}}-{{PROJECT}}-sql.postgres.database.azure.com:57000/"
+        "mssql+pyodbc://sql_admin:{{SQL_DB_ADMIN_PASSWORD}}@{{ENV}}-{{PROJECT}}-sql.database.windows.net:1433/"
         "{{ENV}}_erp?driver=ODBC+Driver+18+for+SQL+Server"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
