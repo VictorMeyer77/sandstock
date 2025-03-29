@@ -44,10 +44,10 @@ test: lint        ## Run tests and generate coverage report.
 	$(ENV_PREFIX)TEST=true pytest -v --cov-config .coveragerc --cov=sandstock -l --tb=short --maxfail=1 -p no:logging tests/
 	@docker stop azure-sql-edge
 	@docker rm azure-sql-edge
-	@PYTEST_EXIT_CODE=$?
+	@PYTEST_EXIT_CODE=$$?
 	$(ENV_PREFIX)coverage xml
 	$(ENV_PREFIX)coverage html
-	@exit $PYTEST_EXIT_CODE
+	@exit $$PYTEST_EXIT_CODE
 
 .PHONY: clean
 clean:            ## Clean unused files.
