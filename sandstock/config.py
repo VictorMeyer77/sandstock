@@ -1,9 +1,21 @@
 import os
 
+from azure.identity import DefaultAzureCredential
+from azure.keyvault.secrets import SecretClient
+
 
 class Config:
+
+    db_password = ""
+    if os.getenv("TEST") != "true":
+        credential = DefaultAzureCredential()
+        secret_client = SecretClient(vault_url="https://{{ENV}}-sandstock-kv.vault.azure.net/", credential=credential)
+        db_password = secret_client.get_secret("{{ENV}}-erp-db-password").value or ""
+
     SQLALCHEMY_DATABASE_URI = (
-        "mssql+pyodbc://sql_admin:{{SQL_DB_ADMIN_PASSWORD}}@{{ENV}}-{{PROJECT}}-sql.database.windows.net:1433/"
+        "mssql+pyodbc://{{ENV}}_erp_usr:"
+        f"{db_password}"
+        "@{{ENV}}-{{PROJECT}}-sql.database.windows.net:1433/"
         "{{ENV}}_erp?driver=ODBC+Driver+18+for+SQL+Server"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
