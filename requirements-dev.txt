@@ -8,3 +8,4 @@ mypy
 mkdocs
 mkdocstrings
 mkdocstrings-python
+pymdown-extensions>=10.16.1 # not directly required, pinned by Snyk to avoid a vulnerability
